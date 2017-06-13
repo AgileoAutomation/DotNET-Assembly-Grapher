@@ -17,7 +17,7 @@ More details about specification files are available lower in this page.
  
 DotNET Assembly Grapher builds a model of your .NET application and display a graph based on the model:
  
-![Graph](blob/master/Images/Graph.JPG)
+![Graph](https://github.com/AgileoAutomation/DotNET-Assembly-Grapher/blob/master/Images/Graph.JPG)
  
 #### Graph Handling
  

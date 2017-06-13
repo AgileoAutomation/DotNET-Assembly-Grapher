@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNETAssemblyGrapher.Model
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{F01BA062-5B90-4A2B-918B-A074C22E2AE2}"
 	ProjectSection(SolutionItems) = preProject
+		..\demoExcelSpec.xlsx = ..\demoExcelSpec.xlsx
+		..\demoJSONSpec.json = ..\demoJSONSpec.json
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject

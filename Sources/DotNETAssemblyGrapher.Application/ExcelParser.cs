@@ -32,7 +32,7 @@ namespace DotNETAssemblyGrapherApplication
             }
             catch
             {
-                MessageBox.Show("The specifications file is open in a other process");
+                MessageBox.Show("The specification file is open in a other process");
                 return null;
             }
             
@@ -40,13 +40,13 @@ namespace DotNETAssemblyGrapherApplication
 
             try
             {
-                Sheet sheet = workbookPart.Workbook.Sheets.ChildElements.Cast<Sheet>().First(x => x.Name == "Assemblies Info");
+                Sheet sheet = workbookPart.Workbook.Sheets.ChildElements.Cast<Sheet>().First(x => x.Name == "Assembly Info");
                 int index = workbookPart.WorksheetParts.ToList().IndexOf(workbookPart.WorksheetParts.Last()) - workbookPart.Workbook.Sheets.ToList().IndexOf(sheet);
                 sheetData = workbookPart.WorksheetParts.ElementAt(index).Worksheet.Elements<SheetData>().First();
             }
             catch
             {
-                MessageBox.Show("Invalid specifications file :\nCouldn't find the 'Assemblies Info' worksheet");
+                MessageBox.Show("Invalid specification file :\nCouldn't find the 'Assembly Info' worksheet");
                 return null;
             }
             
@@ -63,13 +63,13 @@ namespace DotNETAssemblyGrapherApplication
             }
             catch
             {
-                MessageBox.Show("Invalid specifications file :\nPlease respect the spreadsheet pattern, you didn't specified the assemblies column");
+                MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified the assembly column");
             }
 
             rows.RemoveAt(0);
             rows.RemoveAll(x => !x.Elements<Cell>().Any(y => !string.IsNullOrEmpty(TextInCell(y))));
 
-            while (rows.Count > 1)
+            while (rows.Count > 0)
             {
                 specs.Add(BuildSpec(0, assembliesColumn));
             }
@@ -97,9 +97,12 @@ namespace DotNETAssemblyGrapherApplication
                     do
                     {
                         component.Subcomponents.Add(BuildSpec(currentColumn, assembliesColumn));
+                        if (rows.Count == 0)
+                            break;
                         row = rows.First().Elements<Cell>().ToList();
                         currentCell = row.ElementAt(currentColumn);
-                    } while (!string.IsNullOrEmpty(TextInCell(currentCell)) && rows.Count > 1);
+                    } while (!string.IsNullOrEmpty(TextInCell(currentCell))
+                            && string.IsNullOrEmpty(TextInCell(row.ElementAt(currentColumn - 1))));
                 }
                 else
                 {
@@ -113,22 +116,29 @@ namespace DotNETAssemblyGrapherApplication
                             }
                             catch
                             {
-                                MessageBox.Show("Invalid specifications file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
+                                MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
                             }
 
                             rows.RemoveAt(0);
+                            if (rows.Count == 0)
+                                break;
                             row = rows.First().Elements<Cell>().ToList();
                             currentCell = row.ElementAt(currentColumn);
-                        } while (string.IsNullOrEmpty(TextInCell(currentCell)) && rows.Count > 1);
+                        } while (string.IsNullOrEmpty(TextInCell(currentCell))
+                                && string.IsNullOrEmpty(TextInCell(row.ElementAt(currentColumn - 1))));
 
-                        if (!string.IsNullOrEmpty(TextInCell(currentCell)) && rows.Count > 1)
+                        if (!string.IsNullOrEmpty(TextInCell(currentCell))
+                            && string.IsNullOrEmpty(TextInCell(row.ElementAt(currentColumn - 1))))
                         {
                             do
                             {
                                 component.Subcomponents.Add(BuildSpec(currentColumn, assembliesColumn));
+                                if (rows.Count == 0)
+                                    break;
                                 row = rows.First().Elements<Cell>().ToList();
                                 currentCell = row.ElementAt(currentColumn);
-                            } while (!string.IsNullOrEmpty(TextInCell(currentCell)) && rows.Count > 1);                            
+                            } while (!string.IsNullOrEmpty(TextInCell(currentCell))
+                                    && string.IsNullOrEmpty(TextInCell(row.ElementAt(currentColumn - 1))));
                         }
                     }
                 }
@@ -137,7 +147,7 @@ namespace DotNETAssemblyGrapherApplication
             {
                 currentColumn--;
                 cellContent = null;
-                while (string.IsNullOrEmpty(cellContent) && rows.Count > 1)
+                while (string.IsNullOrEmpty(cellContent))
                 {
                     try
                     {
@@ -149,10 +159,13 @@ namespace DotNETAssemblyGrapherApplication
                     }
                     catch
                     {
-                        MessageBox.Show("Invalid specifications file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
+                        MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
                     }
 
                     rows.RemoveAt(0);
+                    if (rows.Count == 0)
+                        break;
+                        
                     row = rows.First().Elements<Cell>().ToList();
                     cellContent = null;
 
@@ -162,7 +175,6 @@ namespace DotNETAssemblyGrapherApplication
                         if (!string.IsNullOrEmpty(TextInCell(cell)))
                             break;
                     }
-
                 }
             }
 

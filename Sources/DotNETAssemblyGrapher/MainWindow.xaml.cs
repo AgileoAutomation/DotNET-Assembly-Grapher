@@ -232,7 +232,7 @@ namespace DotNETAssemblyGrapher
         }
 
         ////////////////////////////////
-        /////////SPECIFICATIONS/////////
+        /////////EXTRA ANALYSES/////////
         ////////////////////////////////
 
         WorkbookPart workbookPart;
@@ -262,20 +262,20 @@ namespace DotNETAssemblyGrapher
                 }
                 catch
                 {
-                    System.Windows.MessageBox.Show("The specifications file is open in a other process");
+                    System.Windows.MessageBox.Show("The specification file is open in a other process");
                 }
 
                 SheetData sheetData = null;
 
                 try
                 {
-                    Sheet sheet = workbookPart.Workbook.Sheets.ChildElements.Cast<Sheet>().First(x => x.Name == "Assemblies Specifications");
+                    Sheet sheet = workbookPart.Workbook.Sheets.ChildElements.Cast<Sheet>().First(x => x.Name == "Assembly Specification");
                     int index = workbookPart.WorksheetParts.ToList().IndexOf(workbookPart.WorksheetParts.Last()) - workbookPart.Workbook.Sheets.ToList().IndexOf(sheet);
                     sheetData = workbookPart.WorksheetParts.ElementAt(index).Worksheet.Elements<SheetData>().First();
                 }
                 catch
                 {
-                    System.Windows.MessageBox.Show("Invalid specifications file :\nCouldn't find the 'Assemblies Specifications' worksheet");
+                    System.Windows.MessageBox.Show("Invalid specification file :\nCouldn't find the 'Assembly Specification' worksheet");
                 }
 
                 List<Row> rows = sheetData.Elements<Row>().ToList();

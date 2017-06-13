@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DotNETAssemblyGrapher"
         mc:Ignorable="d"
-        Title="Specifications Window" Height="302" Width="489">
+        Title="Specification Window" Height="302" Width="489">
     <Grid>
         <Label x:Name="label" Content="Enter a specifications file path or drop the file in this window" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Height="26" Width="340"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="20" Margin="20,60,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="285" AutomationProperties.HelpText="Enter a specifications file path to build model components" TextChanged="textBox_TextChanged"/>

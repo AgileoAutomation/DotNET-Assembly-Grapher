@@ -1,31 +1,27 @@
 [
   {
     "Name": "Grapher",
-    "Assemblies": [ "DotNETAssembliesGrapher" ],
-    "Color": "Orange",
+    "Assemblies": [ "DotNETAssemblyGrapher*" ],
+    "Color": "OrangeRed"
+  },
+  {
+    "Name": "External sources",
+    "Color": "ForestGreen",
     "Subcomponents": [
-      {
-        "Name": "Model engine",
-        "Assemblies": [
-          "DependenciesModel",
-          "ModelApplications"
-        ],
-        "Color": "ForestGreen"
-      },
       {
         "Name": "MSAGL",
         "Assemblies": [ "Microsoft.Msagl*" ],
-        "Color": "Chocolate"
+        "Color": "CadetBlue"
+      },
+      {
+        "Name": "Other external sources",
+        "Assemblies": [
+          "Newtonsoft.Json",
+          "DocumentFormat.OpenXml"
+        ],
+        "Color": "DarkOrange"
       }
     ]
-  },
-  {
-    "Name": "Other external sources",
-    "Assemblies": [
-      "Newtonsoft.Json",
-      "DocumentFormat.OpenXml"
-    ],
-    "Color": "Black"
   }
 ]
 

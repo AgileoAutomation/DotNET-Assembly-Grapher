@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="DependenciesModel.AssemblyPointer">
+    <Position X="5.25" Y="6" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgAAAAAAAAQAAAEIAAAAAAAAEEJAIAAAAAAACBAA=</HashCode>
+      <FileName>AssemblyPointer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Properties" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DependenciesModel.AssemblyPointerGroup">
+    <Position X="5.75" Y="3.5" Width="2.5" />
+    <AssociationLine Name="Pointers" Type="DependenciesModel.AssemblyPointer" FixedFromPoint="true">
+      <Path>
+        <Point X="7.438" Y="5.055" />
+        <Point X="7.438" Y="6" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-2.314" Y="0.386" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AssemblyPointerGroup.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Pointers" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DependenciesModel.ComponentsBuilder">
+    <Position X="13.25" Y="3.5" Width="3.25" />
+    <AssociationLine Name="parentComponents" Type="DependenciesModel.SoftwareComponent" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="13.938" Y="3.5" />
+        <Point X="13.938" Y="2.938" />
+        <Point X="13" Y="2.938" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.11" Y="0.083" Height="0.182" Width="3.118" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAACAAAAAAAAAAAAAAAgARAAAAAAAAAAEA=</HashCode>
+      <FileName>ComponentsBuilder.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="parentComponents" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DependenciesModel.ComponentSpecification">
+    <Position X="13.75" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ComponentSpecification.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DependenciesModel.Dependency">
+    <Position X="0.5" Y="8" Width="2" />
+    <AssociationLine Name="From" Type="DependenciesModel.AssemblyPointer" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="8.688" />
+        <Point X="5.25" Y="8.688" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.063" Y="-0.325" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="To" Type="DependenciesModel.AssemblyPointer" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="8.295" />
+        <Point X="5.25" Y="8.295" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dependency.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="From" />
+      <Property Name="To" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DependenciesModel.Model">
+    <Position X="0.5" Y="0.5" Width="3.75" />
+    <AssociationLine Name="Dependencies" Type="DependenciesModel.Dependency" FixedToPoint="true">
+      <Path>
+        <Point X="1.5" Y="3.401" />
+        <Point X="1.5" Y="8" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-2.55" Y="0.063" Height="0.182" Width="2.371" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="AssemblyPointerGroups" Type="DependenciesModel.AssemblyPointerGroup" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.25" Y="3.188" />
+        <Point X="6.562" Y="3.188" />
+        <Point X="6.562" Y="3.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.467" Y="0.401" Height="0.182" Width="3.661" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="SoftwareComponents" Type="DependenciesModel.SoftwareComponent" FixedFromPoint="true">
+      <Path>
+        <Point X="4.25" Y="2.562" />
+        <Point X="9.25" Y="2.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.037" Y="0.075" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Inputs" Type="DependenciesModel.AssemblyPointer" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.375" Y="3.401" />
+        <Point X="2.375" Y="6.656" />
+        <Point X="5.25" Y="6.656" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.413" Y="0.072" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="AllAssemblies" Type="DependenciesModel.AssemblyPointer" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.125" Y="3.401" />
+        <Point X="2.125" Y="7.18" />
+        <Point X="5.25" Y="7.18" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="listForBuild" Type="DependenciesModel.AssemblyPointer" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.688" Y="3.401" />
+        <Point X="2.688" Y="6.197" />
+        <Point X="5.25" Y="6.197" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.063" Y="0.083" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAABACIAAAAAABIFAAAgAAEBAAAAAEACAQ=</HashCode>
+      <FileName>Model.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="listForBuild" />
+      <Property Name="Dependencies" />
+      <Property Name="AssemblyPointerGroups" />
+      <Property Name="SoftwareComponents" />
+      <Property Name="Inputs" />
+      <Property Name="AllAssemblies" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DependenciesModel.ModelCommonDataOrganizer">
+    <Position X="4.5" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>ModelCommonDataOrganizer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DependenciesModel.Property">
+    <Position X="10.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Property.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DependenciesModel.SoftwareComponent">
+    <Position X="9.25" Y="1" Width="3.75" />
+    <AssociationLine Name="AssemblyPointerGroups" Type="DependenciesModel.AssemblyPointerGroup" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.938" Y="3.709" />
+        <Point X="11.938" Y="4.375" />
+        <Point X="8.25" Y="4.375" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.133" Y="0.095" Height="0.182" Width="3.38" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Subcomponents" Type="DependenciesModel.SoftwareComponent" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="13" Y="1.349" />
+        <Point X="13.516" Y="1.349" />
+        <Point X="13.516" Y="1.786" />
+        <Point X="13" Y="1.786" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.095" Y="0.483" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Pointers" Type="DependenciesModel.AssemblyPointer" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.312" Y="3.709" />
+        <Point X="12.312" Y="6.5" />
+        <Point X="8.75" Y="6.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.273" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAARAAAQAAAAIAAAABAAAgAkAgAA=</HashCode>
+      <FileName>SoftwareComponent.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="AssemblyPointerGroups" />
+      <Property Name="Subcomponents" />
+      <Property Name="Pointers" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Interface Name="DependenciesModel.Analyzer">
+    <Position X="3" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Analyzer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

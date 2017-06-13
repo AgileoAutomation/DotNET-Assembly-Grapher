@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Sources/DotNETAssemblyGrapher/bin/Debug
+/Sources/DotNETAssemblyGrapher/obj/Debug
+/Sources/DotNETAssemblyGrapher.Application/.vs/ModelApplication/v14
+/Sources/DotNETAssemblyGrapher.Application/bin/Debug
+/Sources/DotNETAssemblyGrapher.Application/obj/Debug
+/Sources/DotNETAssemblyGrapher.Model/bin/Debug
+/Sources/DotNETAssemblyGrapher.Model/obj/Debug
+/Sources/packages

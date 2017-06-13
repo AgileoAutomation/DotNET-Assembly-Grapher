@@ -1,0 +1,38 @@
+[
+  {
+    "Name": "Grapher",
+    "Assemblies": [ "DotNETAssembliesGrapher" ],
+    "Color": "Orange",
+    "Subcomponents": [
+      {
+        "Name": "Model engine",
+        "Assemblies": [
+          "DependenciesModel",
+          "ModelApplications"
+        ],
+        "Color": "ForestGreen"
+      },
+      {
+        "Name": "MSAGL",
+        "Assemblies": [ "Microsoft.Msagl*" ],
+        "Color": "Chocolate"
+      }
+    ]
+  },
+  {
+    "Name": "Other external sources",
+    "Assemblies": [
+      "Newtonsoft.Json",
+      "DocumentFormat.OpenXml"
+    ],
+    "Color": "Black"
+  }
+]
+
+
+
+
+
+
+
+

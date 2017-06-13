@@ -2,18 +2,15 @@
 {
     public class Dependency
     {
+        public AssemblyPointer From { get; }
+
+        public AssemblyPointer To { get; }
+
         public Dependency(AssemblyPointer from, AssemblyPointer to)
         {
             From = from;
             To = to;
         }
 
-        /////////////////////
-        ///////GETTERS///////
-        /////////////////////
-
-        public AssemblyPointer From { get; internal set; }
-
-        public AssemblyPointer To { get; internal set; }
     }
 }

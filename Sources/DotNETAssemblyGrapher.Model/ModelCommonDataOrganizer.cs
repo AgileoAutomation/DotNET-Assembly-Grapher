@@ -23,10 +23,8 @@ namespace DotNETAssemblyGrapherModel
                     referencedAssemblies.Add(dependency.To);
             }
 
-            foreach (AssemblyPointer pointer in model.FindGroup("All Assemblies").Pointers)
+            foreach (AssemblyPointer pointer in model.FindGroupByName("All Assemblies").Pointers)
             {
-                pointer.BuildProperties();
-
                 if (pointer.IsSystemAssembly)
                 {
                     pointer.AddProperty("Component", "System Assemblies");
@@ -50,21 +48,21 @@ namespace DotNETAssemblyGrapherModel
             if (systemAssemblies.Count != 0)
             {
                 SoftwareComponent SystemAssemblies = new SoftwareComponent("System Assemblies", systemAssemblies, System.Drawing.Color.Blue);
-                SystemAssemblies.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Assemblies", systemAssemblies));
+                SystemAssemblies.AddAssemblyPointerGroup("Assemblies", systemAssemblies);
                 model.SoftwareComponents.Add(SystemAssemblies);
             }
 
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Referenced Assemblies", referencedAssemblies));
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Non Referenced Assemblies", nonReferencedAssemblies));
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Missing Assemblies", missingAssemblies));
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Version Conflicts", versionConfilcts));
+            model.AddAssemblyPointerGroup("Referenced Assemblies", referencedAssemblies);
+            model.AddAssemblyPointerGroup("Non Referenced Assemblies", nonReferencedAssemblies);
+            model.AddAssemblyPointerGroup("Missing Assemblies", missingAssemblies);
+            model.AddAssemblyPointerGroup("Version Conflicts", versionConfilcts);
         }
 
         private static List<AssemblyPointer> FindVersionConflicts(AssemblyPointer pointer, Model model)
         {
             List<AssemblyPointer> versionConfilcts = new List<AssemblyPointer>();
 
-            foreach (AssemblyPointer similar in model.FindGroup("All Assemblies").Pointers)
+            foreach (AssemblyPointer similar in model.FindGroupByName("All Assemblies").Pointers)
             {
                 if (pointer.GetName().Name.Equals(similar.GetName().Name)
                     && !pointer.GetName().Version.Equals(similar.GetName().Version))
@@ -94,9 +92,9 @@ namespace DotNETAssemblyGrapherModel
                 }
 
                 if (group.Name != "All Assemblies")
-                    component.AssemblyPointerGroups.Add(new AssemblyPointerGroup(group.Name, pointers));
+                    component.AddAssemblyPointerGroup(group.Name, pointers);
                 else
-                    component.AssemblyPointerGroups.Add(new AssemblyPointerGroup("Assemblies", pointers));
+                    component.AddAssemblyPointerGroup("Assemblies", pointers);
             }
 
             foreach (SoftwareComponent subcomponent in component.Subcomponents)

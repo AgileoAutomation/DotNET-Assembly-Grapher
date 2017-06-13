@@ -28,7 +28,7 @@ namespace DotNETAssemblyGrapher
         GraphViewer GraphViewer = new GraphViewer();
         TreeViewItem SelectedItem;
         TreeViewItem ParentItem;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,7 +43,7 @@ namespace DotNETAssemblyGrapher
             treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
         }
 
-        
+
         ///////////////////////////////////////////
         /////////BUILD EVENTS AND SETTINGS/////////
         ///////////////////////////////////////////
@@ -91,7 +91,8 @@ namespace DotNETAssemblyGrapher
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 DirectoryInfo directory = new DirectoryInfo(dialog.SelectedPath);
-                if (directory.Exists && directory.GetFiles().Any(x => x.Extension == ".dll" || x.Extension == ".exe"))
+                if (directory.Exists
+                    && directory.GetFiles().Any(x => x.Extension == ".dll" || x.Extension == ".exe"))
                 {
                     SpecWindow = new SpecificationWindow();
                     SpecWindow.ShowDialog();
@@ -120,9 +121,19 @@ namespace DotNETAssemblyGrapher
             Model = new Model();
 
             if (SpecWindow.ExcludeDefaultCSGraphicLibAssemblies)
-                Model.regexList = new List<Regex>() { new Regex("PresentationCore"), new Regex("PresentationFramework"), new Regex("mscorlib"), new Regex("System"), new Regex("System.Core"), new Regex("System.Data"), new Regex("System.Data.DataSetExtension"), new Regex("System.Net.Http"), new Regex("System.Xaml"), new Regex("System.Xml"), new Regex("System.Xml.Linq"), new Regex("WindowsBase"), new Regex("System.Deployment"), new Regex("System.Drawing"), new Regex("System.Windows.Forms") };
+            {
+                ExcludeDotNETFrameworkAssemblies();
+                Model.AddRegex("PresentationCore");
+                Model.AddRegex("PresentationFramework");
+                Model.AddRegex("WindowsBase");
+                Model.AddRegex("System.Deployment");
+                Model.AddRegex("System.Drawing");
+                Model.AddRegex("System.Windows.Forms");
+            }
             else if (SpecWindow.ExcludeDefaultCSLibAssemblies)
-                Model.regexList = new List<Regex>() { new Regex("mscorlib"), new Regex("System"), new Regex("System.Core"), new Regex("System.Data"), new Regex("System.Data.DataSetExtension"), new Regex("System.Net.Http"), new Regex("System.Xaml"), new Regex("System.Xml"), new Regex("System.Xml.Linq") };
+            {
+                ExcludeDotNETFrameworkAssemblies();
+            }
 
             try
             {
@@ -135,14 +146,18 @@ namespace DotNETAssemblyGrapher
             }
 
             //// Step 2 : Specifications adding
-            
+
             if (!string.IsNullOrEmpty(SpecWindow.SpecFilePath))
             {
                 try
                 {
                     ComponentsBuilder builder = new ComponentsBuilder(SpecWindow.SpecFilePath);
                     builder.Build(Model);
-                    Model.SoftwareComponents.Where(x => x.Name != "System Assemblies").ToList().ForEach(x => ModelCommonDataOrganizer.UpdateGroups(Model, x));
+                    Model
+                        .SoftwareComponents
+                        .Where(x => x.Name != "System Assemblies")
+                        .ToList()
+                        .ForEach(x => ModelCommonDataOrganizer.UpdateGroups(Model, x));
                 }
                 catch
                 {
@@ -161,12 +176,24 @@ namespace DotNETAssemblyGrapher
             return true;
         }
 
+        private void ExcludeDotNETFrameworkAssemblies()
+        {
+            Model.AddRegex("mscorlib");
+            Model.AddRegex("System");
+            Model.AddRegex("System.Core");
+            Model.AddRegex("System.Data");
+            Model.AddRegex("System.Data.DataSetExtension");
+            Model.AddRegex("System.Net.Http");
+            Model.AddRegex("System.Xml");
+            Model.AddRegex("System.Xml.Linq");
+        }
+
         private void ResetViews()
         {
             // Reset Treeview
             if (SelectedItem != null)
             {
-                SoftwareComponent component = Model.FindComponent((string)SelectedItem.Header);
+                SoftwareComponent component = Model.FindComponentByName((string)SelectedItem.Header);
                 if (component != null)
                     SelectedItem.Foreground = new SolidColorBrush(ConvertSystemDrawingToWindowsMediaColor(component.Color));
                 else if (ParentItem != null
@@ -406,7 +433,7 @@ namespace DotNETAssemblyGrapher
                 }
             }
         }
-        
+
 
         private void Node_MarkedForDragging(object sender, EventArgs e)
         {
@@ -654,7 +681,7 @@ namespace DotNETAssemblyGrapher
             ResetViews();
 
             SelectedItem = (TreeViewItem)treeView.SelectedItem;
-            
+
 
             if (SelectedItem != null)
             {

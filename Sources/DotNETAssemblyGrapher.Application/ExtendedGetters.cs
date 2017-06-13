@@ -1,34 +1,30 @@
 ﻿using DotNETAssemblyGrapherModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DotNETAssemblyGrapherApplication
 {
     public static class ExtendedGetters
     {
-        public static List<AssemblyPointer> AllAssemblies(this Model model)
+        public static ReadOnlyCollection<AssemblyPointer> AllAssemblies(this Model model)
         {
-            return model.FindGroup("All Assemblies").Pointers;
+            return model.FindGroupByName("All Assemblies").Pointers;
         }
 
-        public static List<AssemblyPointer> MissingAssemblies(this Model model)
+        public static ReadOnlyCollection<AssemblyPointer> MissingAssemblies(this Model model)
         {
-            return model.FindGroup("Missing Assemblies").Pointers;
+            return model.FindGroupByName("Missing Assemblies").Pointers;
         }
 
-        public static List<AssemblyPointer> NonReferencedAssemblies(this Model model)
+        public static ReadOnlyCollection<AssemblyPointer> NonReferencedAssemblies(this Model model)
         {
-            return model.FindGroup("Non referenced Assemblies").Pointers;
-        }
-
-        public static List<AssemblyPointer> SimilarAssemblies(this Model model)
-        {
-            return model.FindGroup("Similar Assemblies").Pointers;
+            return model.FindGroupByName("Non referenced Assemblies").Pointers;
         }
     }
 
     public static class SoftwareComponentGetters
     {
-        public static List<AssemblyPointer> Assemblies(this SoftwareComponent component)
+        public static ReadOnlyCollection<AssemblyPointer> Assemblies(this SoftwareComponent component)
         {
             return component.FindGroup("Assemblies").Pointers;
         }

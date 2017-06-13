@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
@@ -15,7 +16,7 @@ namespace DotNETAssemblyGrapherModel
                 return Errors.Count != 0;
             }
         }
-        public Assembly Assembly { get; internal set; }
+        public Assembly Assembly { get; private set; }
         public List<Property> Properties { get; private set; } = new List<Property>();
         public List<string> Errors { get; private set; } = new List<string>();
 
@@ -35,12 +36,17 @@ namespace DotNETAssemblyGrapherModel
                 // Impossible to load, the assembly does not exist.
                 Errors.Add("This assembly is referenced but physically missing");
             }
+            finally
+            {
+                BuildProperties();
+            }
         }
 
         public AssemblyPointer(Assembly assembly)
         {
             name = assembly.GetName();
             Assembly = assembly;
+            BuildProperties();
         }
 
         private void Load()
@@ -49,7 +55,7 @@ namespace DotNETAssemblyGrapherModel
             Assembly = Assembly.Load(name);
         }
 
-        public void BuildProperties()
+        private void BuildProperties()
         {
             AddProperty("Name", GetName().Name);
             AddProperty("Version", GetName().Version);
@@ -63,20 +69,15 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
-        /////////////////////
-        ///////SETTERS///////
-        /////////////////////
-
         public void AddProperty(string name, object value)
         {
             Property property = new Property(name, value);
-            if (FindProperty(name) == null)
-                Properties.Add(property);
+            if (FindProperty(name) != null)
+            {
+                throw new InvalidOperationException($"Property {name} already exists");
+            }
+            Properties.Add(property);
         }
-
-        /////////////////////
-        ///////GETTERS///////
-        /////////////////////
 
         public AssemblyName GetName()
         {
@@ -91,9 +92,9 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
-        public List<AssemblyName> GetReferencedAssemblies()
+        public ReadOnlyCollection<AssemblyName> GetReferencedAssemblies()
         {
-            return Assembly?.GetReferencedAssemblies().ToList();
+            return Assembly?.GetReferencedAssemblies().ToList().AsReadOnly();
         }
 
         public bool PhysicalyExists

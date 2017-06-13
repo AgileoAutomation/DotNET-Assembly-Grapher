@@ -1,17 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DotNETAssemblyGrapherModel
 {
     public class AssemblyPointerGroup
     {
-        public List<AssemblyPointer> Pointers { get; internal set; } = new List<AssemblyPointer>();
-        public String Name { get; set; }
 
-        public AssemblyPointerGroup(String name, List<AssemblyPointer> assemblies)
+        private List<AssemblyPointer> pointers = new List<AssemblyPointer>();
+
+        public ReadOnlyCollection<AssemblyPointer> Pointers
+        {
+            get { return pointers.AsReadOnly() ; }
+        }
+
+        public string Name { get; }
+
+        public AssemblyPointerGroup(string name, IEnumerable<AssemblyPointer> assemblies)
         {
             Name = name;
-            Pointers.AddRange(assemblies);
+            pointers.AddRange(assemblies);
         }
     }
 }

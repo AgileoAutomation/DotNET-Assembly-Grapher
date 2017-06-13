@@ -64,7 +64,7 @@ namespace DotNETAssemblyGrapherApplication
                 }
                 else
                 {
-                    AssemblyPointer pointer = model.FindPointer(assemblyname);
+                    AssemblyPointer pointer = model.FindPointerByName(assemblyname);
                     if (pointer != null && pointer.Component() == null)
                     {
                         componentPointers.Add(pointer);

@@ -2,18 +2,14 @@
 {
     public class Property
     {
-        public string Name { get; internal set; }
-        public object Value { get; set; }
+        public string Name { get; private set; }
 
-        //public T GetValue<T>()
-        //{
-        //    return (T)Value;
-        //}
+        public object Value { get; set; }
 
         public Property(string name, object value)
         {
             Name = name;
             Value = value;
-        } 
+        }
     }
 }

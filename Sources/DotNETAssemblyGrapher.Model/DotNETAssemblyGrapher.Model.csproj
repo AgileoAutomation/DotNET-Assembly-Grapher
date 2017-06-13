@@ -44,6 +44,7 @@
     <Compile Include="Analyzer.cs" />
     <Compile Include="AssemblyPointerGroup.cs" />
     <Compile Include="AssemblyPointer.cs" />
+    <Compile Include="AssemblyPointerGroupContainer.cs" />
     <Compile Include="Dependency.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="ModelCommonDataOrganizer.cs" />

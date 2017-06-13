@@ -7,19 +7,26 @@ using System.Text.RegularExpressions;
 
 namespace DotNETAssemblyGrapherModel
 {
-    public class Model
+    public class Model : AssemblyPointerGroupContainer
     {
         ////////////////////////
         ///////PROPERTIES///////
         ////////////////////////
 
-        public List<Regex> regexList = new List<Regex>();
-        private HashSet<AssemblyPointer> Inputs { get; } = new HashSet<AssemblyPointer>();
+        private List<Regex> filterRegexList = new List<Regex>();
+        public void AddRegex(string regex)
+        {
+            filterRegexList.Add(new Regex(regex));
+        }
+
+
+        private HashSet<AssemblyPointer> inputs = new HashSet<AssemblyPointer>();
+
         private HashSet<AssemblyPointer> AllAssemblies
         {
             get
             {
-                HashSet<AssemblyPointer> result = new HashSet<AssemblyPointer>(Inputs);
+                HashSet<AssemblyPointer> result = new HashSet<AssemblyPointer>(inputs);
                 foreach (Dependency dependency in Dependencies)
                 {
                     result.Add(dependency.From);
@@ -29,11 +36,9 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
-        public List<Dependency> Dependencies { get; internal set; } = new List<Dependency>();
+        public List<Dependency> Dependencies { get; } = new List<Dependency>();
 
-        public List<AssemblyPointerGroup> AssemblyPointerGroups { get; internal set; } = new List<AssemblyPointerGroup>();
-
-        public List<SoftwareComponent> SoftwareComponents { get; internal set; } = new List<SoftwareComponent>();
+        public List<SoftwareComponent> SoftwareComponents { get; } = new List<SoftwareComponent>();
 
         /////////////////////////////
         /////////BUILD MODEL/////////
@@ -45,21 +50,20 @@ namespace DotNETAssemblyGrapherModel
 
         public void Build(DirectoryInfo dir)
         {
-
             foreach (FileInfo file in dir.GetFiles())
             {
                 if (file.Extension == ".exe" || file.Extension == ".dll")
                 {
-                    Inputs.Add(new AssemblyPointer(Assembly.LoadFrom(file.FullName)));
+                    inputs.Add(new AssemblyPointer(Assembly.LoadFrom(file.FullName)));
                 }
             }
-            foreach (AssemblyPointer pointer in Inputs)
+            foreach (AssemblyPointer pointer in inputs)
             {
                 LoadAllReferencedAssemblies(pointer);
             }
 
-            AssemblyPointerGroups.Add(new AssemblyPointerGroup("Model Inputs", Inputs.ToList()));
-            AssemblyPointerGroups.Add(new AssemblyPointerGroup("All Assemblies", AllAssemblies.ToList()));
+            AddAssemblyPointerGroup("Model Inputs", inputs);
+            AddAssemblyPointerGroup("All Assemblies", AllAssemblies);
         }
 
         private void LoadAllReferencedAssemblies(AssemblyPointer from)
@@ -72,9 +76,9 @@ namespace DotNETAssemblyGrapherModel
             listForBuild.Add(from);
 
             // Load and Build AssemblyPointers and Dependencies
-            foreach (AssemblyName name in from.GetReferencedAssemblies().Where(x => !regexList.Any(y => y.Match(x.Name).Success)))
+            foreach (AssemblyName name in GetFilteredReferencedAssemblies(from))
             {
-                AssemblyPointer to = FindAssembly(name);
+                AssemblyPointer to = FindAssemblyByName(name);
                 if (to == null)
                     to = new AssemblyPointer(name);
 
@@ -85,12 +89,20 @@ namespace DotNETAssemblyGrapherModel
                 }
             }
 
-            foreach (AssemblyName name in from.GetReferencedAssemblies().Where(x => !regexList.Any(y => y.Match(x.Name).Success)))
+            foreach (AssemblyName name in GetFilteredReferencedAssemblies(from))
             {
-                AssemblyPointer to = GetAssembly(name);
+                AssemblyPointer to = GetAssemblyByName(name);
                 if (to.PhysicalyExists)
                     LoadAllReferencedAssemblies(to);
             }
+        }
+
+        private IEnumerable<AssemblyName> GetFilteredReferencedAssemblies(AssemblyPointer from)
+        {
+            return from
+                .GetReferencedAssemblies()
+                .Where(x => !filterRegexList
+                                .Any(y => y.Match(x.Name).Success));
         }
 
         /////////////////////////////
@@ -103,14 +115,14 @@ namespace DotNETAssemblyGrapherModel
                                                     && x.To.GetName().Equals(to.GetName()));
         }
 
-        private AssemblyPointer FindAssembly(AssemblyName name)
+        private AssemblyPointer FindAssemblyByName(AssemblyName name)
         {
             return AllAssemblies.FirstOrDefault(x => x.GetName().FullName == name.FullName);
         }
 
-        private AssemblyPointer GetAssembly(AssemblyName name)
+        private AssemblyPointer GetAssemblyByName(AssemblyName name)
         {
-            AssemblyPointer pointer = FindAssembly(name);
+            AssemblyPointer pointer = FindAssemblyByName(name);
             if (pointer == null)
                 throw new InvalidOperationException();
             return pointer;
@@ -120,25 +132,24 @@ namespace DotNETAssemblyGrapherModel
         ///////PUBLIC GETTERS///////
         ////////////////////////////
 
-        public AssemblyPointer FindPointer(string name)
+        public AssemblyPointer FindPointerByName(string name)
         {
             return AllAssemblies.FirstOrDefault(x => x.GetName().Name == name);
         }
 
-        public AssemblyPointer FindPointerByPrettyName(string prettyname)
+        public AssemblyPointer FindPointerByPrettyName(string prettyName)
         {
-            return AllAssemblies.FirstOrDefault(x => x.PrettyName == prettyname);
+            return AllAssemblies.FirstOrDefault(x => x.PrettyName == prettyName);
         }
 
-        public AssemblyPointerGroup FindGroup(string name)
+        public AssemblyPointerGroup FindGroupByName(string name)
         {
             return AssemblyPointerGroups.FirstOrDefault(x => x.Name == name);
         }
 
-        public SoftwareComponent FindComponent(string name)
+        public SoftwareComponent FindComponentByName(string name)
         {
             SoftwareComponent result = SoftwareComponents.FirstOrDefault(x => x.Name == name);
-
             if (result == null)
             {
                 foreach (SoftwareComponent component in SoftwareComponents)

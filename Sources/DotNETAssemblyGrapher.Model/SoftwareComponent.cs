@@ -5,13 +5,12 @@ using System.Drawing;
 
 namespace DotNETAssemblyGrapherModel
 {
-    public class SoftwareComponent
+    public class SoftwareComponent : AssemblyPointerGroupContainer
     {
-        public String Name { get; set; }
+        public string Name { get; set; }
         private List<AssemblyPointer> Pointers { get; } = new List<AssemblyPointer>();
         public Color Color { get; set; }
         public List<SoftwareComponent> Subcomponents { get; } = new List<SoftwareComponent>();
-        public List<AssemblyPointerGroup> AssemblyPointerGroups { get; } = new List<AssemblyPointerGroup>();
 
         public bool HasGroups
         {
@@ -32,27 +31,27 @@ namespace DotNETAssemblyGrapherModel
         /////////CONSTRUCTORS/////////
         //////////////////////////////
 
-        public SoftwareComponent(string name, List<AssemblyPointer> assemblies)
+        //public SoftwareComponent(string name, List<AssemblyPointer> assemblies)
+        //{
+        //    if (assemblies == null || string.IsNullOrEmpty(name))
+        //        throw new ArgumentNullException();
+        //    else if (assemblies.Count == 0)
+        //        throw new ArgumentException();
+
+        //    Name = name;
+        //    Color = Color.Black;
+
+        //    foreach (AssemblyPointer pointer in assemblies)
+        //    {
+        //        Pointers.Add(pointer);
+        //    }
+        //}
+
+        public SoftwareComponent(string name, IEnumerable<AssemblyPointer> assemblies, Color color)
         {
             if (assemblies == null || string.IsNullOrEmpty(name))
                 throw new ArgumentNullException();
-            else if (assemblies.Count == 0)
-                throw new ArgumentException();
-
-            Name = name;
-            Color = Color.Black;
-
-            foreach (AssemblyPointer pointer in assemblies)
-            {
-                Pointers.Add(pointer);
-            }
-        }
-
-        public SoftwareComponent(string name, List<AssemblyPointer> assemblies, Color color)
-        {
-            if (assemblies == null || string.IsNullOrEmpty(name))
-                throw new ArgumentNullException();
-            else if (assemblies.Count == 0)
+            else if (assemblies.Count() == 0)
                 throw new ArgumentException();
 
             Name = name;
@@ -64,26 +63,26 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
-        public SoftwareComponent(string name, List<AssemblyPointer> assemblies, List<SoftwareComponent> subcomponents)
-        {
-            if (assemblies == null || string.IsNullOrEmpty(name) || subcomponents == null)
-                throw new ArgumentNullException();
-            else if (assemblies.Count == 0 && subcomponents.Count == 0)
-                throw new ArgumentException();
+        //public SoftwareComponent(string name, List<AssemblyPointer> assemblies, List<SoftwareComponent> subcomponents)
+        //{
+        //    if (assemblies == null || string.IsNullOrEmpty(name) || subcomponents == null)
+        //        throw new ArgumentNullException();
+        //    else if (assemblies.Count == 0 && subcomponents.Count == 0)
+        //        throw new ArgumentException();
 
-            Name = name;
-            Color = Color.Black;
+        //    Name = name;
+        //    Color = Color.Black;
 
-            foreach (AssemblyPointer pointer in assemblies)
-            {
-                Pointers.Add(pointer);
-            }
+        //    foreach (AssemblyPointer pointer in assemblies)
+        //    {
+        //        Pointers.Add(pointer);
+        //    }
 
-            foreach (SoftwareComponent subcomponent in subcomponents)
-            {
-                AddSubcomponent(subcomponent);
-            }
-        }
+        //    foreach (SoftwareComponent subcomponent in subcomponents)
+        //    {
+        //        AddSubcomponent(subcomponent);
+        //    }
+        //}
 
         public SoftwareComponent(string name, List<AssemblyPointer> assemblies, Color color, List<SoftwareComponent> subcomponents)
         {

@@ -39,8 +39,8 @@ namespace DotNETAssemblyGrapherApplication
                 }
             }
 
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup(" Signed Assemblies", signedAssemblies));
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup(" Unsigned Assemblies", unsignedAssemblies));
+            model.AddAssemblyPointerGroup("Signed Assemblies", signedAssemblies);
+            model.AddAssemblyPointerGroup("Unsigned Assemblies", unsignedAssemblies);
         }
     }
 }

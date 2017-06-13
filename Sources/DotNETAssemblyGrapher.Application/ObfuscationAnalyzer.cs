@@ -40,8 +40,8 @@ namespace DotNETAssemblyGrapherApplication
                 }
             }
 
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup(" Obfuscated Assemblies", obfuscatedAssemblies));
-            model.AssemblyPointerGroups.Add(new AssemblyPointerGroup(" Non Obfuscated Assemblies", nonObfuscatedAssemblies));
+            model.AddAssemblyPointerGroup(" Obfuscated Assemblies", obfuscatedAssemblies);
+            model.AddAssemblyPointerGroup(" Non Obfuscated Assemblies", nonObfuscatedAssemblies);
         }
     }
 }

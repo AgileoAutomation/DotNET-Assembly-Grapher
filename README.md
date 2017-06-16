@@ -1,5 +1,5 @@
 # DotNET Assembly Grapher
-DotNET Assembly Grapher is a reverse engineering and software quality insurance tool for .NET applications with several assemblies. It proposes the following features:
+DotNET Assembly Grapher is a reverse engineering and software quality assurance tool for .NET applications with several assemblies. It proposes the following features:
 - Display .NET assembly dependencies in a graph
 - Check for inconsistencies such as assemblies not referenced or assemblies referenced but not present
 - Detect .NET Framework assemblies and let user hide them
@@ -8,7 +8,7 @@ DotNET Assembly Grapher is a reverse engineering and software quality insurance 
 
 Compared to other existing tools that generate a static graph, user can interact dynamically with assemblies in the graph and see assemblies properties.
 
-**DotNET Assembly Grapher can be used for software quality insurance** to verify that:
+**DotNET Assembly Grapher can be used for software quality assurance** to verify that:
 - Implementation is aligned with architecture.
 - Released software contains:
     * all needed assemblies, 

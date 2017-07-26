@@ -1,11 +1,25 @@
 # DotNET Assembly Grapher
-DotNET Assembly Grapher is a .NET tool to graph .NET assemblies, their dependencies and add sanity checks.
+DotNET Assembly Grapher is a reverse engineering and software quality assurance tool for .NET applications with several assemblies. It proposes the following features:
+- Display .NET assembly dependencies in a graph
+- Check for inconsistencies such as assemblies not referenced or assemblies referenced but not present
+- Detect .NET Framework assemblies and let user hide them
+- Group assemblies in logical packages based on a specification provided in a configuration file
+- Check if assemblies are signed and/or obfuscated
+
+Compared to other existing tools that generate a static graph, user can interact dynamically with assemblies in the graph and see assemblies properties.
+
+**DotNET Assembly Grapher can be used for software quality assurance** to verify that:
+- Implementation is aligned with architecture.
+- Released software contains:
+    * all needed assemblies, 
+    * only needed assemblies
+    * assemblies for release
  
-You will find more details about assembly concept on this page: https://msdn.microsoft.com/en-us/library/hk5f40ct(v=vs.90).aspx
- 
-This software was developed in Agileo Automation.
+This software was developed in [Agileo Automation](http://www.agileo-automation.com).
  
 ## Getting Started
+You will find more details about assembly concept on this page: https://msdn.microsoft.com/en-us/library/hk5f40ct(v=vs.90).aspx
+
 Open the DotNETAssemblyGrapher.exe.
  
 You can choose the directory to analyze in a dialog, by clicking on the *Open* button in the top left corner, or drop it in the window.

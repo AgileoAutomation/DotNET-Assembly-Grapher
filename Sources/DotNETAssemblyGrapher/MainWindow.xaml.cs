@@ -13,7 +13,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Text.RegularExpressions;
 
 namespace DotNETAssemblyGrapher
 {
@@ -140,9 +139,9 @@ namespace DotNETAssemblyGrapher
                 Model.Build(directory);
                 ModelCommonDataOrganizer.Organize(Model);
             }
-            catch
+            catch (Exception e)
             {
-                System.Windows.MessageBox.Show("Grapher can analyze only DLLs build with .NET assemblies");
+                System.Windows.MessageBox.Show("Grapher can analyze only DLLs built with .NET assemblies: "+e.Message);
             }
 
             //// Step 2 : Specifications adding

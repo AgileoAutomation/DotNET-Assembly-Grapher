@@ -54,7 +54,14 @@ namespace DotNETAssemblyGrapherModel
             {
                 if (file.Extension == ".exe" || file.Extension == ".dll")
                 {
-                    inputs.Add(new AssemblyPointer(Assembly.LoadFrom(file.FullName)));
+                    try
+                    {
+                        inputs.Add(new AssemblyPointer(Assembly.LoadFrom(file.FullName)));
+                    }
+                    catch (BadImageFormatException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
             foreach (AssemblyPointer pointer in inputs)

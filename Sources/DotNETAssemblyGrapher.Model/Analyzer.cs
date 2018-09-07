@@ -5,7 +5,7 @@ namespace DotNETAssemblyGrapherModel
     public interface Analyzer
     {
         void Analyze(Model model, List<ISpecification> specifications);
-    }
+    } 
 
     public interface ISpecification
     {

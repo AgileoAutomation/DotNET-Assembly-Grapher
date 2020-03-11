@@ -79,7 +79,7 @@ namespace DotNETAssemblyGrapherApplication
 
                 return component;
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return null;
             }

@@ -3,8 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:msagl="clr-namespace:Microsoft.Msagl.WpfGraphControl;assembly=Microsoft.Msagl.WpfGraphControl" 
-        xmlns:local="clr-namespace:DotNETAssemblyGrapher"
         mc:Ignorable="d"
         Title="DotNETAssembliesGrapher" WindowState="Maximized" AllowDrop="True" Height="675" Width="1350" MinWidth="1350" MinHeight="675">
     <Grid>

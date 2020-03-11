@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
-using System.Windows.Forms;
 
 namespace DotNETAssemblyGrapherApplication
 {
@@ -17,10 +16,9 @@ namespace DotNETAssemblyGrapherApplication
                 reader = File.OpenText(filepath);
                 serializer = new JsonSerializer();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("The specifications file is open in a other process");
-                return null;
+                throw new InvalidOperationException("The specification file is open in a other process", ex);
             }
             
 
@@ -29,10 +27,9 @@ namespace DotNETAssemblyGrapherApplication
                 List<ComponentSpecification> specs = (List<ComponentSpecification>)serializer.Deserialize(reader, typeof(List<ComponentSpecification>));
                 return specs;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show("Invalid specifications file :\nPlease you must give at least an assembly or a subcomponent by component");
-                return null;
+                throw new InvalidOperationException("Invalid specifications file :\nPlease you must give at least an assembly or a subcomponent by component", ex);
             }
         }
     }

@@ -13,6 +13,14 @@ using System.Reflection;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Msagl.Core.Geometry;
+using Microsoft.Msagl.Core.Geometry.Curves;
+using Microsoft.Msagl.Layout.Incremental;
+using Microsoft.Msagl.Layout.LargeGraphLayout;
+using Microsoft.Msagl.Layout.Layered;
+using Microsoft.Msagl.Layout.MDS;
+using Microsoft.Msagl.Prototype.Ranking;
+using Point = Microsoft.Msagl.Core.Geometry.Point;
 
 namespace DotNETAssemblyGrapher
 {
@@ -158,8 +166,9 @@ namespace DotNETAssemblyGrapher
                         .ToList()
                         .ForEach(x => ModelCommonDataOrganizer.UpdateGroups(Model, x));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Windows.MessageBox.Show(ex.Message);
                     return false; // an exception is raised in JSONParser or in a SoftwareComponent constructor
                 }
             }

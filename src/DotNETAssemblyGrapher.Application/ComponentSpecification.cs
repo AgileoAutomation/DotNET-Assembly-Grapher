@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Reflection;
 
 namespace DotNETAssemblyGrapherApplication
@@ -42,8 +41,7 @@ namespace DotNETAssemblyGrapherApplication
         {
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Invalid Specification File :\nPlease respect the spreadsheet pattern, you didn't specified a component");
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(name), "Invalid Specification File :\nPlease respect the spreadsheet pattern, you didn't specified a component");
             }
 
             Name = name;

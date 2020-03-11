@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Windows.Forms;
 
 namespace DotNETAssemblyGrapherApplication
 {
@@ -30,10 +30,9 @@ namespace DotNETAssemblyGrapherApplication
                 SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(filepath, false);
                 workbookPart = spreadsheetDocument.WorkbookPart;
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("The specification file is open in a other process");
-                return null;
+                throw new InvalidOperationException("The specification file is open in a other process", ex);
             }
             
             SheetData sheetData = null;
@@ -44,10 +43,9 @@ namespace DotNETAssemblyGrapherApplication
                 int index = workbookPart.WorksheetParts.ToList().IndexOf(workbookPart.WorksheetParts.Last()) - workbookPart.Workbook.Sheets.ToList().IndexOf(sheet);
                 sheetData = workbookPart.WorksheetParts.ElementAt(index).Worksheet.Elements<SheetData>().First();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Invalid specification file :\nCouldn't find the 'Assembly Info' worksheet");
-                return null;
+                throw new InvalidOperationException("Invalid specification file :\nCouldn't find the 'Assembly Info' worksheet", ex);
             }
             
 
@@ -61,9 +59,9 @@ namespace DotNETAssemblyGrapherApplication
                 List<Cell> headerRow = rows.First().Elements<Cell>().ToList();
                 assembliesColumn = headerRow.IndexOf(headerRow.First(x => TextInCell(x) == "Assemblies"));
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified the assembly column");
+                throw new InvalidOperationException("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified the assembly column", ex);
             }
 
             rows.RemoveAt(0);
@@ -114,9 +112,9 @@ namespace DotNETAssemblyGrapherApplication
                             {
                                 component.Assemblies.Add(TextInCell(row.ElementAt(assembliesColumn)));
                             }
-                            catch
+                            catch (Exception ex)
                             {
-                                MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
+                                throw new InvalidOperationException("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly", ex);
                             }
 
                             rows.RemoveAt(0);
@@ -157,9 +155,9 @@ namespace DotNETAssemblyGrapherApplication
                         else
                             break;
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly");
+                        throw new InvalidOperationException("Invalid specification file :\nPlease respect the spreadsheet pattern, you didn't specified an assembly", ex);
                     }
 
                     rows.RemoveAt(0);

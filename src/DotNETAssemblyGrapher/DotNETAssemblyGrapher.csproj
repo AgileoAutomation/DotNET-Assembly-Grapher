@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AssemblyTitle>DotNETAssemblyGrapher</AssemblyTitle>
+    <Product>DotNETAssemblyGrapher</Product>
+    <Copyright>Copyright © Agileo Automation 2020</Copyright>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutomaticGraphLayout.WpfGraphControl" Version="1.1.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotNETAssemblyGrapher.Application\DotNETAssemblyGrapher.Application.csproj" />
+    <ProjectReference Include="..\DotNETAssemblyGrapher.Model\DotNETAssemblyGrapher.Model.csproj" />
+  </ItemGroup>
+</Project>

@@ -43,13 +43,17 @@
       <HintPath>..\packages\DocumentFormat.OpenXml.2.7.1\lib\net45\DocumentFormat.OpenXml.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.Material.4.5.0\lib\net45\MahApps.Metro.IconPacks.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Material, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.Material.4.5.0\lib\net45\MahApps.Metro.IconPacks.Material.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Msagl, Version=3.0.0.0, Culture=neutral, PublicKeyToken=640c57aa40e7ae7d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\staticPackages\Microsoft.Msagl.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Msagl.1.1.3\lib\net40\Microsoft.Msagl.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Msagl.Drawing, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8a3d7c21d5fa1306, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\staticPackages\Microsoft.Msagl.Drawing.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Msagl.Drawing.1.1.3\lib\net40\Microsoft.Msagl.Drawing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Msagl.WpfGraphControl, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -59,7 +63,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -77,10 +80,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="SpecificationWindow.xaml.cs">
-      <DependentUpon>SpecificationWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="AssemblyGroupViewModel.cs" />
+    <Compile Include="DependencyGraphViewModel.cs" />
+    <Compile Include="AssemblyPointerViewModel.cs" />
+    <Compile Include="ModelBuildingViewModel.cs" />
+    <Compile Include="UserCommand.cs" />
+    <Page Include="GrapherView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -88,16 +93,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="BaseViewModel.cs" />
+    <Compile Include="GrapherView.xaml.cs">
+      <DependentUpon>GrapherView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SpecificationWindow.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="ModelSpecificationsView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GrapherViewModel.cs" />
+    <Compile Include="ModelSpecificationsView.xaml.cs">
+      <DependentUpon>ModelSpecificationsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -126,9 +136,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="app.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DotNETAssemblyGrapher.Application\DotNETAssemblyGrapher.Application.csproj">
       <Project>{cd93fcbb-ffb0-4207-ab08-f5b1e831cf0f}</Project>
       <Name>DotNETAssemblyGrapher.Application</Name>
@@ -137,6 +144,11 @@
       <Project>{287061c2-7772-49aa-bbae-1d85d3726578}</Project>
       <Name>DotNETAssemblyGrapher.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Ressources\Graph.JPG" />
+    <Resource Include="Ressources\GUIAssemblies.jpg" />
+    <Resource Include="Ressources\SystemAssemblies.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

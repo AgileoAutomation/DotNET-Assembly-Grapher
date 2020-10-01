@@ -82,7 +82,7 @@ namespace DotNETAssemblyGrapher
             AllowDrop = true;
         }
 
-        private void open_Click(object sender, RoutedEventArgs e)
+        private void Open_Click(object sender, RoutedEventArgs e)
         {
             AllowDrop = false;
             FolderBrowserDialog dialog = new FolderBrowserDialog();
@@ -117,27 +117,16 @@ namespace DotNETAssemblyGrapher
             Topmost = false;
 
             //// Step 1 : Model creation
-            Model = new Model();
-
-            if (SpecWindow.ExcludeDefaultCSGraphicLibAssemblies)
+            Model = new Model(directory)
             {
-                ExcludeDotNETFrameworkAssemblies();
-                Model.AddRegex("PresentationCore");
-                Model.AddRegex("PresentationFramework");
-                Model.AddRegex("WindowsBase");
-                Model.AddRegex("System.Deployment");
-                Model.AddRegex("System.Drawing");
-                Model.AddRegex("System.Windows.Forms");
-            }
-            else if (SpecWindow.ExcludeDefaultCSLibAssemblies)
-            {
-                ExcludeDotNETFrameworkAssemblies();
-            }
+                excludeSystemCommonAssemblies = SpecWindow.ExcludeDefaultCSLibAssemblies,
+                excludeSystemGUIAssemblies = SpecWindow.ExcludeDefaultCSGraphicLibAssemblies
+            };
 
             try
             {
-                Model.Build(directory);
-                ModelCommonDataOrganizer.Organize(Model);
+                Model.Build();
+                Model.Classify();
             }
             catch (Exception e)
             {
@@ -152,11 +141,6 @@ namespace DotNETAssemblyGrapher
                 {
                     ComponentsBuilder builder = new ComponentsBuilder(SpecWindow.SpecFilePath);
                     builder.Build(Model);
-                    Model
-                        .SoftwareComponents
-                        .Where(x => x.Name != "System Assemblies")
-                        .ToList()
-                        .ForEach(x => ModelCommonDataOrganizer.UpdateGroups(Model, x));
                 }
                 catch
                 {
@@ -175,18 +159,6 @@ namespace DotNETAssemblyGrapher
             return true;
         }
 
-        private void ExcludeDotNETFrameworkAssemblies()
-        {
-            Model.AddRegex("mscorlib");
-            Model.AddRegex("System");
-            Model.AddRegex("System.Core");
-            Model.AddRegex("System.Data");
-            Model.AddRegex("System.Data.DataSetExtension");
-            Model.AddRegex("System.Net.Http");
-            Model.AddRegex("System.Xml");
-            Model.AddRegex("System.Xml.Linq");
-        }
-
         private void ResetViews()
         {
             // Reset Treeview
@@ -197,7 +169,7 @@ namespace DotNETAssemblyGrapher
                     SelectedItem.Foreground = new SolidColorBrush(ConvertSystemDrawingToWindowsMediaColor(component.Color));
                 else if (ParentItem != null
                         && (string)ParentItem.Header == "Groups"
-                        && SelectedItem.Items.Cast<TreeViewItem>().Any(x => Model.FindPointerByPrettyName((string)x.Header).HasErrors))
+                        && SelectedItem.Items.Cast<TreeViewItem>().Any(x => Model.FindAssemblyById((string)x.Header).HasErrors))
                 {
                     SelectedItem.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255,0,0));
                 }
@@ -246,11 +218,13 @@ namespace DotNETAssemblyGrapher
                 return null;
         }
 
-        private void analysis_Click(object sender, RoutedEventArgs e)
+        private void Analysis_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "SpreadSheets (*.xlsx) | *.xlsx";
-            dialog.Multiselect = false;
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "SpreadSheets (*.xlsx) | *.xlsx",
+                Multiselect = false
+            };
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -315,7 +289,6 @@ namespace DotNETAssemblyGrapher
                     obfuscationAnalyzer.Analyze(Model, obfuscationspecs);
                 }
 
-                Model.SoftwareComponents.Where(x => x.Name != "System Assemblies").ToList().ForEach(x => ModelCommonDataOrganizer.UpdateGroups(Model, x));
                 UpdateTreeView();
                 UpdateErrorNodes(GraphViewer.Graph);
                 analysis.Visibility = Visibility.Hidden;
@@ -333,27 +306,27 @@ namespace DotNETAssemblyGrapher
             // Draw edges and nodes
             foreach (Dependency dependency in Model.Dependencies)
             {
-                if (!dependency.To.PhysicalyExists)
+                if (!dependency.to.physicalyExists)
                 {
-                    graph.AddEdge(dependency.From.PrettyName, dependency.To.PrettyName).Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
+                    graph.AddEdge(dependency.from.Id, dependency.to.Id).Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
                 }
                 else
-                    graph.AddEdge(dependency.From.PrettyName, dependency.To.PrettyName);
+                    graph.AddEdge(dependency.from.Id, dependency.to.Id);
             }
 
             //Set subgraphs
             foreach (SoftwareComponent component in Model.SoftwareComponents)
             {
-                graph.RootSubgraph.AddSubgraph(setSubgraph(graph, component));
+                graph.RootSubgraph.AddSubgraph(SetSubgraph(graph, component));
             }
 
             // Alone nodes
-            foreach (AssemblyPointer pointer in Model.AllAssemblies())
+            foreach (AssemblyPointer pointer in Model.AllAssemblies)
             {
-                if (graph.FindNode(pointer.PrettyName) == null)
+                if (graph.FindNode(pointer.Id) == null)
                 {
                     pointer.Errors.Add("This assembly is not referenced and it reference only some hidden system assemblies");
-                    Node node = new Node(pointer.PrettyName);
+                    Node node = new Node(pointer.Id);
                     graph.AddNode(node);
                 }
             }
@@ -361,22 +334,27 @@ namespace DotNETAssemblyGrapher
             GraphViewer.Graph = graph;
         }
 
-        private Subgraph setSubgraph(Graph graph, SoftwareComponent component)
+        private Subgraph SetSubgraph(Graph graph, SoftwareComponent component)
         {
             Subgraph subgraph = new Subgraph(component.Name);
 
             // Before build children subgraphs
             foreach (SoftwareComponent subcomponent in component.Subcomponents)
             {
-                subgraph.AddSubgraph(setSubgraph(graph, subcomponent));
+                subgraph.AddSubgraph(SetSubgraph(graph, subcomponent));
             }
 
             // Add correct nodes in subgraph
-            foreach (AssemblyPointer pointer in component.Assemblies().Where(x => (string)x.Component() == component.Name))
+            foreach (AssemblyPointer pointer in component.AllAssemblies)
             {
-                Node node = graph.FindNode(pointer.PrettyName);
-                if (node != null)
-                    subgraph.AddNode(node);
+                Property comp = pointer.FindProperty("Component");
+                if (comp != null
+                    && comp.value == component.Name)
+                {
+                    Node node = graph.FindNode(pointer.Id);
+                    if (node != null)
+                        subgraph.AddNode(node);
+                }
             }
 
             subgraph.Attr.Color = ConvertSystemDrawingToMsaglColor(component);
@@ -394,13 +372,13 @@ namespace DotNETAssemblyGrapher
 
         private void UpdateErrorNodes(Graph graph)
         {
-            foreach (AssemblyPointer pointer in Model.AllAssemblies().Where(x => x.HasErrors))
+            foreach (AssemblyPointer pointer in Model.AllAssemblies.Where(x => x.HasErrors))
             {
-                Node node = graph.FindNode(pointer.PrettyName);
+                Node node = graph.FindNode(pointer.Id);
 
                 // Reset red color
                 node.Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
-                if (Model.MissingAssemblies().Contains(pointer))
+                if (Model.FindGroupByName("Missing Assemblies").Assemblies.Contains(pointer))
                 {
                     foreach (Edge edge in node.InEdges)
                         edge.Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
@@ -443,7 +421,7 @@ namespace DotNETAssemblyGrapher
                 VNode node = (VNode)sender;
                 if (!(node.Node is Subgraph))
                 {
-                    AssemblyPointer pointer = Model.FindPointerByPrettyName(node.Node.LabelText);
+                    AssemblyPointer pointer = Model.FindAssemblyById(node.Node.LabelText);
                     ShowPropertiesAndErrors(pointer);
 
                     // Set referenced nodes to highlighted mode
@@ -475,7 +453,7 @@ namespace DotNETAssemblyGrapher
         }
 
         bool errorsHidden = false;
-        private void hideErrors_Click(object sender, RoutedEventArgs e)
+        private void HideErrors_Click(object sender, RoutedEventArgs e)
         {
             if (errorsHidden)
             {// show errors
@@ -517,7 +495,11 @@ namespace DotNETAssemblyGrapher
                 c.Width = 336;
                 errorsGrid.Columns.Add(c);
 
-                pointer.Errors.ForEach(x => { errorsGrid.Items.Add(x); });
+                foreach (string error in pointer.Errors)
+                {
+                    errorsGrid.Items.Add(error);
+                }
+
                 errorsGrid.Visibility = Visibility.Visible;
                 TabItem itemErrors = (TabItem)tabControl.Items.GetItemAt(1);
                 itemErrors.Visibility = Visibility.Visible;
@@ -544,15 +526,21 @@ namespace DotNETAssemblyGrapher
         {
             treeView.Items.Clear();
 
-            TreeViewItem modelItem = new TreeViewItem();
-            modelItem.Header = "Model";
-            TreeViewItem groupsItem = new TreeViewItem();
-            groupsItem.Header = "Groups";
-            TreeViewItem componentsItem = new TreeViewItem();
-            componentsItem.Header = "Components";
+            TreeViewItem modelItem = new TreeViewItem
+            {
+                Header = "Model"
+            };
+            TreeViewItem groupsItem = new TreeViewItem
+            {
+                Header = "Groups"
+            };
+            TreeViewItem componentsItem = new TreeViewItem
+            {
+                Header = "Components"
+            };
 
             // Set TreeviewItems
-            foreach (AssemblyPointerGroup group in Model.AssemblyPointerGroups)
+            foreach (AssemblyPointerGroup group in Model.Groups)
             {
                 groupsItem.Items.Add(SetTreeViewGroupItem(group));
             }
@@ -597,8 +585,10 @@ namespace DotNETAssemblyGrapher
 
         private TreeViewItem SetTreeViewComponentItem(SoftwareComponent component)
         {
-            TreeViewItem componentItem = new TreeViewItem();
-            componentItem.Header = component.Name;
+            TreeViewItem componentItem = new TreeViewItem
+            {
+                Header = component.Name
+            };
 
             //Color Management
             if (component.Color.Name != "Black")
@@ -609,10 +599,12 @@ namespace DotNETAssemblyGrapher
            // Groups build
             if (component.HasGroups)
             {
-                TreeViewItem groupsItem = new TreeViewItem();
-                groupsItem.Header = "Groups";
+                TreeViewItem groupsItem = new TreeViewItem
+                {
+                    Header = "Groups"
+                };
 
-                foreach (AssemblyPointerGroup group in component.AssemblyPointerGroups)
+                foreach (AssemblyPointerGroup group in component.Groups)
                 {
                     groupsItem.Items.Add(SetTreeViewGroupItem(group));
                 }
@@ -622,8 +614,10 @@ namespace DotNETAssemblyGrapher
             // Subcomponents build
             if (component.HasSubcomponents)
             {
-                TreeViewItem subcomponentsItem = new TreeViewItem();
-                subcomponentsItem.Header = "Subcomponents";
+                TreeViewItem subcomponentsItem = new TreeViewItem
+                {
+                    Header = "Subcomponents"
+                };
 
                 foreach (SoftwareComponent subcomponent in component.Subcomponents)
                 {
@@ -638,17 +632,21 @@ namespace DotNETAssemblyGrapher
 
         private TreeViewItem SetTreeViewGroupItem(AssemblyPointerGroup group)
         {
-            TreeViewItem groupItem = new TreeViewItem();
-            groupItem.Header = group.Name;
+            TreeViewItem groupItem = new TreeViewItem
+            {
+                Header = group.name
+            };
 
             // Reported Errors
-            if (group.Pointers.Any(x => x.HasErrors))
+            if (group.Assemblies.Any(x => x.HasErrors))
                 ColorizeErrorItem(groupItem);
 
-            foreach (AssemblyPointer pointer in group.Pointers)
+            foreach (AssemblyPointer pointer in group.Assemblies)
             {
-                TreeViewItem pointerItem = new TreeViewItem();
-                pointerItem.Header = pointer.PrettyName;
+                TreeViewItem pointerItem = new TreeViewItem
+                {
+                    Header = pointer.Id
+                };
                 if (pointer.HasErrors)
                     ColorizeErrorItem(pointerItem);
 
@@ -732,7 +730,7 @@ namespace DotNETAssemblyGrapher
                 }
                 else if (!SelectedItem.HasItems)
                 {// Set a selected assembly to highlighted mode
-                    AssemblyPointer pointer = Model.FindPointerByPrettyName((string)SelectedItem.Header);
+                    AssemblyPointer pointer = Model.FindAssemblyById((string)SelectedItem.Header);
                     if (pointer != null)
                         ShowPropertiesAndErrors(pointer);
 

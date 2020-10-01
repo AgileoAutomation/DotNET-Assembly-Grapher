@@ -9,15 +9,11 @@ namespace DotNETAssemblyGrapherModel
 {
     public class AssemblyPointerGroupContainer
     {
+        public List<AssemblyPointerGroup> Groups { get; } = new List<AssemblyPointerGroup>();
 
-        private List<AssemblyPointerGroup> assemblyPointerGroups = new List<AssemblyPointerGroup>();
-
-        public ReadOnlyCollection<AssemblyPointerGroup> AssemblyPointerGroups { get { return assemblyPointerGroups.AsReadOnly(); } }
-
-        public void AddAssemblyPointerGroup(string groupName, IEnumerable<AssemblyPointer> assemblyPointers)
+        public void AddGroup(string groupName, IEnumerable<AssemblyPointer> inputs)
         {
-            assemblyPointerGroups.Add(new AssemblyPointerGroup(groupName, assemblyPointers));
+            Groups.Add(new AssemblyPointerGroup(groupName, inputs));
         }
-
     }
 }

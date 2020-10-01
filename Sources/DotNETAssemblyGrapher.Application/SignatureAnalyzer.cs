@@ -12,35 +12,35 @@ namespace DotNETAssemblyGrapherApplication
             List<AssemblyPointer> signedAssemblies = new List<AssemblyPointer>();
             List<AssemblyPointer> unsignedAssemblies = new List<AssemblyPointer>();
 
-            foreach (AssemblyPointer pointer in model.AllAssemblies().Where(x => !x.IsSystemAssembly))
+            foreach (AssemblyPointer pointer in model.AllAssemblies.Where(x => !x.IsSystemAssembly))
             {
-                if (pointer.PhysicalyExists)
+                if (pointer.physicalyExists)
                 {
-                    if (pointer.GetName().GetPublicKeyToken().Count() != 0)
+                    if (pointer.AssemblyName.GetPublicKeyToken().Count() != 0)
                     {
                         pointer.AddProperty("Signed", true);
-                        pointer.AddProperty("PublicKeyToken", BitConverter.ToString(pointer.GetName().GetPublicKeyToken()));
+                        pointer.AddProperty("PublicKeyToken", BitConverter.ToString(pointer.AssemblyName.GetPublicKeyToken()));
                         signedAssemblies.Add(pointer);
 
-                        SignatureSpecification spec = sigspecs.FirstOrDefault(x => x.Name == pointer.GetName().Name);
+                        SignatureSpecification spec = sigspecs.FirstOrDefault(x => x.Name == pointer.AssemblyName.Name);
                         if (spec != null && !spec.IsSigned)
                             pointer.Errors.Add("This assembly is signed but it should not be signed");
                     }
                     else
                     {
                         pointer.AddProperty("Signed", false);
-                        pointer.AddProperty("PublicKeyToken", BitConverter.ToString(pointer.GetName().GetPublicKeyToken()));
+                        pointer.AddProperty("PublicKeyToken", BitConverter.ToString(pointer.AssemblyName.GetPublicKeyToken()));
                         unsignedAssemblies.Add(pointer);
 
-                        SignatureSpecification spec = sigspecs.FirstOrDefault(x => x.Name == pointer.GetName().Name);
+                        SignatureSpecification spec = sigspecs.FirstOrDefault(x => x.Name == pointer.AssemblyName.Name);
                         if (spec != null && spec.IsSigned)
                             pointer.Errors.Add("This assembly is not signed but it should be signed");
                     }
                 }
             }
 
-            model.AddAssemblyPointerGroup("Signed Assemblies", signedAssemblies);
-            model.AddAssemblyPointerGroup("Unsigned Assemblies", unsignedAssemblies);
+            model.AddGroup("Signed Assemblies", signedAssemblies);
+            model.AddGroup("Unsigned Assemblies", unsignedAssemblies);
         }
     }
 }

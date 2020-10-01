@@ -4,83 +4,115 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.ObjectModel;
+using System.Drawing;
 
 namespace DotNETAssemblyGrapherModel
 {
     public class Model : AssemblyPointerGroupContainer
     {
-        ////////////////////////
-        ///////PROPERTIES///////
-        ////////////////////////
+        private readonly DirectoryInfo directory;
 
-        private List<Regex> filterRegexList = new List<Regex>();
-        public void AddRegex(string regex)
+        public Model(DirectoryInfo directory)
         {
-            filterRegexList.Add(new Regex(regex));
+            this.directory = directory;
         }
 
+        #region Properties
 
-        private HashSet<AssemblyPointer> inputs = new HashSet<AssemblyPointer>();
-
-        private HashSet<AssemblyPointer> AllAssemblies
+        private ReadOnlyCollection<Regex> SystemCommonAssemblies
         {
             get
             {
-                HashSet<AssemblyPointer> result = new HashSet<AssemblyPointer>(inputs);
+                return new List<Regex>()
+                {
+                    new Regex("mscorlib"),
+                    new Regex("System"),
+                    new Regex("System.Core"),
+                    new Regex("System.Data"),
+                    new Regex("System.Data.DataSetExtension"),
+                    new Regex("System.Net.Http"),
+                    new Regex("System.Xml"),
+                    new Regex("System.Xml.Linq")
+                }.AsReadOnly();
+            }
+        }
+        public bool excludeSystemCommonAssemblies = false;
+
+        private ReadOnlyCollection<Regex> SystemGUIAssemblies
+        {
+            get
+            {
+                return new List<Regex>(SystemCommonAssemblies)
+                {
+                    new Regex("PresentationCore"),
+                    new Regex("PresentationFramework"),
+                    new Regex("WindowsBase"),
+                    new Regex("System.Deployment"),
+                    new Regex("System.Drawing"),
+                    new Regex("System.Windows.Forms")
+                }.AsReadOnly();
+            }
+        }
+        public bool excludeSystemGUIAssemblies = false;
+
+        public HashSet<AssemblyPointer> Inputs { get; set; } = new HashSet<AssemblyPointer>();
+
+        public List<Dependency> Dependencies { get; } = new List<Dependency>();
+
+        public HashSet<AssemblyPointer> AllAssemblies
+        {
+            get
+            {
+                HashSet<AssemblyPointer> result = new HashSet<AssemblyPointer>(Inputs);
                 foreach (Dependency dependency in Dependencies)
                 {
-                    result.Add(dependency.From);
-                    result.Add(dependency.To);
+                    result.Add(dependency.from);
+                    result.Add(dependency.to);
                 }
                 return result;
             }
         }
 
-        public List<Dependency> Dependencies { get; } = new List<Dependency>();
-
         public List<SoftwareComponent> SoftwareComponents { get; } = new List<SoftwareComponent>();
 
-        /////////////////////////////
-        /////////BUILD MODEL/////////
-        /////////////////////////////
+        #endregion
 
-        public Model() { }
-
-        private List<AssemblyPointer> listForBuild = new List<AssemblyPointer>();
-
-        public void Build(DirectoryInfo dir)
+        public void Build()
         {
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (FileInfo file in directory.GetFiles())
             {
                 if (file.Extension == ".exe" || file.Extension == ".dll")
                 {
                     try
                     {
-                        inputs.Add(new AssemblyPointer(Assembly.LoadFrom(file.FullName)));
+                        AssemblyName name = AssemblyName.GetAssemblyName(file.FullName);
+                        Inputs.Add(new AssemblyPointer(name));
                     }
-                    catch (BadImageFormatException e)
+                    catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        Inputs.Add(new AssemblyPointer(file.Name.Replace(file.Extension, ""), e.Message));
                     }
                 }
             }
-            foreach (AssemblyPointer pointer in inputs)
+            foreach (AssemblyPointer pointer in Inputs)
             {
                 LoadAllReferencedAssemblies(pointer);
             }
 
-            AddAssemblyPointerGroup("Model Inputs", inputs);
-            AddAssemblyPointerGroup("All Assemblies", AllAssemblies);
+            AddGroup("Model Inputs", (IEnumerable<AssemblyPointer>)Inputs);
+            AddGroup("All Assemblies", (IEnumerable<AssemblyPointer>)AllAssemblies);
         }
 
+        private HashSet<AssemblyPointer> loadedAssemblies = new HashSet<AssemblyPointer>();
         private void LoadAllReferencedAssemblies(AssemblyPointer from)
         {
             // Already loaded ?
-            if (listForBuild.Contains(from))
+            if (loadedAssemblies.Contains(from))
             {
                 return;
             }
-            listForBuild.Add(from);
+            loadedAssemblies.Add(from);
 
             // Load and Build AssemblyPointers and Dependencies
             foreach (AssemblyName name in GetFilteredReferencedAssemblies(from))
@@ -98,60 +130,122 @@ namespace DotNETAssemblyGrapherModel
 
             foreach (AssemblyName name in GetFilteredReferencedAssemblies(from))
             {
-                AssemblyPointer to = GetAssemblyByName(name);
-                if (to.PhysicalyExists)
+                AssemblyPointer to = FindAssemblyByName(name);
+                if (to.physicalyExists)
                     LoadAllReferencedAssemblies(to);
             }
         }
 
+        #region Classification
+
+        public void Classify()
+        {
+            HashSet<AssemblyPointer> referencedAssemblies = new HashSet<AssemblyPointer>();
+            foreach (Dependency dependency in Dependencies)
+            {
+                referencedAssemblies.Add(dependency.to);
+            }
+
+            HashSet<AssemblyPointer> systemAssemblies = new HashSet<AssemblyPointer>();
+            HashSet<AssemblyPointer> nonReferencedAssemblies = new HashSet<AssemblyPointer>();
+            HashSet<AssemblyPointer> missingAssemblies = new HashSet<AssemblyPointer>();
+            HashSet<AssemblyPointer> nonDotNetAssemblies = new HashSet<AssemblyPointer>();
+
+            foreach (AssemblyPointer assembly in AllAssemblies)
+            {
+                if (assembly.IsSystemAssembly)
+                {
+                    assembly.AddProperty("Component", "System Assemblies");
+                    systemAssemblies.Add(assembly);
+                }
+
+                if (!referencedAssemblies.Contains(assembly))
+                    nonReferencedAssemblies.Add(assembly);
+                else if (!assembly.physicalyExists)
+                    missingAssemblies.Add(assembly);
+
+                if (!assembly.HasManifest)
+                    nonDotNetAssemblies.Add(assembly);
+            }
+
+            AddGroup("Referenced Assemblies", referencedAssemblies);
+            AddGroup("Non Referenced Assemblies", nonReferencedAssemblies);
+            AddGroup("Missing Assemblies", missingAssemblies);
+            AddGroup("Whitout Manifest Assemblies", nonDotNetAssemblies);
+            AddGroup("Version Conflicts", FindVersionConflicts());
+
+            if (systemAssemblies.Count != 0)
+            {
+                SoftwareComponent SystemAssemblies = new SoftwareComponent("System Assemblies", systemAssemblies, Color.Blue);
+                SystemAssemblies.AddGroup("Assemblies", systemAssemblies);
+                AddGroup("System Assemblies", systemAssemblies);
+            }
+        }
+
+        private HashSet<AssemblyPointer> FindVersionConflicts()
+        {
+            HashSet<AssemblyPointer> versionConfilcts = new HashSet<AssemblyPointer>();
+            HashSet<AssemblyPointer> all = new HashSet<AssemblyPointer>(AllAssemblies.Except(FindGroupByName("Whitout Manifest Assemblies").Assemblies));
+
+            foreach (AssemblyPointer assembly in all)
+            {
+                if (all.Any(
+                        p => p.AssemblyName.Name.Equals(assembly.AssemblyName.Name)
+                        && !assembly.AssemblyName.Version.Equals(p.AssemblyName.Version)))
+                {
+                    versionConfilcts.Add(assembly);
+                    assembly.Errors.Add("The model contains other version of this assembly");
+                }
+            }
+
+            return versionConfilcts;
+        }
+
+        #endregion
+
         private IEnumerable<AssemblyName> GetFilteredReferencedAssemblies(AssemblyPointer from)
         {
-            return from
-                .GetReferencedAssemblies()
-                .Where(x => !filterRegexList
-                                .Any(y => y.Match(x.Name).Success));
+            if (excludeSystemGUIAssemblies)
+                return from.GetReferencedAssemblies().Where(x => !SystemGUIAssemblies.Any(y => y.Match(x.Name).Success));
+            else if (excludeSystemCommonAssemblies)
+                return from.GetReferencedAssemblies().Where(x => !SystemCommonAssemblies.Any(y => y.Match(x.Name).Success));
+
+            return from.GetReferencedAssemblies();
         }
 
-        /////////////////////////////
-        ///////PRIVATE GETTERS///////
-        /////////////////////////////
 
-        private Dependency FindDependency(AssemblyPointer from, AssemblyPointer to)
+
+        #region Accessors
+
+        private void AddGroup(string groupName, HashSet<AssemblyPointer> inputs)
         {
-            return Dependencies.FirstOrDefault(x => x.From.GetName().Equals(from.GetName())
-                                                    && x.To.GetName().Equals(to.GetName()));
+            Groups.Add(new AssemblyPointerGroup(groupName, inputs));
         }
 
-        private AssemblyPointer FindAssemblyByName(AssemblyName name)
+        public Dependency FindDependency(AssemblyPointer from, AssemblyPointer to)
         {
-            return AllAssemblies.FirstOrDefault(x => x.GetName().FullName == name.FullName);
+            return Dependencies.FirstOrDefault(x => x.from.AssemblyName.Equals(from.AssemblyName)
+                                                && x.to.AssemblyName.Equals(to.AssemblyName));
         }
 
-        private AssemblyPointer GetAssemblyByName(AssemblyName name)
+        public AssemblyPointer FindAssemblyByName(AssemblyName name)
         {
-            AssemblyPointer pointer = FindAssemblyByName(name);
-            if (pointer == null)
-                throw new InvalidOperationException();
-            return pointer;
+            return AllAssemblies.Where(a => a.AssemblyName != null).FirstOrDefault(x => x.AssemblyName.FullName == name.FullName);
         }
 
-        ////////////////////////////
-        ///////PUBLIC GETTERS///////
-        ////////////////////////////
-
-        public AssemblyPointer FindPointerByName(string name)
+        public AssemblyPointer FindAssemblyByFileName(string filename)
         {
-            return AllAssemblies.FirstOrDefault(x => x.GetName().Name == name);
+            return AllAssemblies.FirstOrDefault(x => x.FindProperty("Name").value == filename);
         }
 
-        public AssemblyPointer FindPointerByPrettyName(string prettyName)
+        public AssemblyPointer FindAssemblyById(string id)
         {
-            return AllAssemblies.FirstOrDefault(x => x.PrettyName == prettyName);
+            return AllAssemblies.FirstOrDefault(x => x.Id == id);
         }
 
         public AssemblyPointerGroup FindGroupByName(string name)
         {
-            return AssemblyPointerGroups.FirstOrDefault(x => x.Name == name);
+            return Groups.FirstOrDefault(x => x.name == name);
         }
 
         public SoftwareComponent FindComponentByName(string name)
@@ -170,5 +264,7 @@ namespace DotNETAssemblyGrapherModel
             else
                 return result;
         }
+
+        #endregion
     }
 }

@@ -2,15 +2,13 @@
 {
     public class Dependency
     {
-        public AssemblyPointer From { get; }
-
-        public AssemblyPointer To { get; }
+        public AssemblyPointer from;
+        public AssemblyPointer to;
 
         public Dependency(AssemblyPointer from, AssemblyPointer to)
         {
-            From = from;
-            To = to;
+            this.from = from;
+            this.to = to;
         }
-
     }
 }

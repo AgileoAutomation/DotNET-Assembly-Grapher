@@ -56,7 +56,6 @@
     <Compile Include="ExcelParser.cs" />
     <Compile Include="IFileParser.cs" />
     <Compile Include="JSONParser.cs" />
-    <Compile Include="ExtendedGetters.cs" />
     <Compile Include="ObfuscationAnalyzer.cs" />
     <Compile Include="ObfuscationSpecification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

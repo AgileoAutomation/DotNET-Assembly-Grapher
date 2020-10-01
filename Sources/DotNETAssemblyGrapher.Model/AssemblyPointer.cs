@@ -8,117 +8,94 @@ namespace DotNETAssemblyGrapherModel
 {
     public class AssemblyPointer
     {
-        private AssemblyName name;
-        public bool HasErrors
-        {
-            get
-            {
-                return Errors.Count != 0;
-            }
-        }
-        public Assembly Assembly { get; private set; }
-        public List<Property> Properties { get; private set; } = new List<Property>();
-        public List<string> Errors { get; private set; } = new List<string>();
-
-        ///////////////////
-        ///////BUILD///////
-        ///////////////////
+        public bool physicalyExists;
 
         public AssemblyPointer(AssemblyName name)
         {
-            this.name = name;
+            AssemblyName = name;
             try
             {
-                Load();
+                Assembly = Assembly.Load(AssemblyName);
+                physicalyExists = true;
             }
             catch (Exception)
             {
                 // Impossible to load, the assembly does not exist.
                 Errors.Add("This assembly is referenced but physically missing");
+                physicalyExists = false;
             }
             finally
             {
-                BuildProperties();
+                AddMainProperties();
             }
         }
 
-        public AssemblyPointer(Assembly assembly)
+        public AssemblyPointer(AssemblyName name, string loadingError)
         {
-            name = assembly.GetName();
-            Assembly = assembly;
-            BuildProperties();
+            AssemblyName = name;
+            physicalyExists = false;
+            Errors.Add(loadingError);
+            AddMainProperties();
         }
 
-        private void Load()
+        public AssemblyPointer(string name, string loadingError)
         {
-            //Assembly = Assembly.ReflectionOnlyLoad(name.FullName);
-            Assembly = Assembly.Load(name);
+            physicalyExists = false;
+            Properties.Add(new Property("Name", name));
+            Errors.Add
+            (
+                "Even AssemblyName can't be loaded: This dll may not be a .NET ddl\n" +
+                "Error Message:\n" + loadingError
+            );
         }
 
-        private void BuildProperties()
-        {
-            AddProperty("Name", GetName().Name);
-            AddProperty("Version", GetName().Version);
-            AddProperty("Culture", GetName().CultureName);
+        public Assembly Assembly { get; private set; }
 
-            if (PhysicalyExists)
+        public AssemblyName AssemblyName { get; private set; }
+
+        public string Id => HasManifest ? AssemblyName.Name + " " + AssemblyName.Version : FindProperty("Name").value;
+
+        public HashSet<Property> Properties { get; private set; } = new HashSet<Property>();
+
+        public bool HasManifest => AssemblyName != null;
+
+        public bool IsSystemAssembly => physicalyExists && Assembly.Location.ToLower().Contains("microsoft.net");
+
+        public HashSet<string> Errors { get; private set; } = new HashSet<string>();
+        public bool HasErrors => Errors.Count > 0;
+
+        private void AddMainProperties()
+        {
+            AddProperty("Name", AssemblyName.Name);
+            AddProperty("Version", AssemblyName.Version);
+            AddProperty("Culture", AssemblyName.CultureName);
+
+            if (physicalyExists)
             {
                 AddProperty("Location", Assembly.Location);
-                AddProperty("Entry Point", Assembly.EntryPoint);
                 AddProperty("Is in the GAC", Assembly.GlobalAssemblyCache);
-            }
-        }
 
-        public void AddProperty(string name, object value)
-        {
-            Property property = new Property(name, value);
-            if (FindProperty(name) != null)
-            {
-                throw new InvalidOperationException($"Property {name} already exists");
-            }
-            Properties.Add(property);
-        }
-
-        public AssemblyName GetName()
-        {
-            return name;
-        }
-
-        public string PrettyName
-        {
-            get
-            {
-                return GetName().Name + " " + GetName().Version;
+                if (Assembly.EntryPoint != null)
+                    Properties.Add(new Property("Entry Point", Assembly.EntryPoint));
             }
         }
 
         public ReadOnlyCollection<AssemblyName> GetReferencedAssemblies()
         {
-            return Assembly?.GetReferencedAssemblies().ToList().AsReadOnly();
-        }
+            if (Assembly == null)
+                return new List<AssemblyName>().AsReadOnly();
 
-        public bool PhysicalyExists
-        {
-            get
-            {
-                return Assembly != null;
-            }
-        }
-
-        public bool IsSystemAssembly
-        {
-            get
-            {
-                if (PhysicalyExists)
-                    return Assembly.Location.ToLower().Contains("microsoft.net");
-                else
-                    return false;
-            }
+            return Assembly.GetReferencedAssemblies().ToList().AsReadOnly();
         }
 
         public Property FindProperty(string propertyName)
         {
-            return Properties.FirstOrDefault(x => x.Name == propertyName);
+            return Properties.FirstOrDefault(x => x.name == propertyName);
+        }
+
+        public void AddProperty(string name, object value)
+        {
+            Properties.Add(new Property(name, value));
         }
     }
 }

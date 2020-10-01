@@ -47,7 +47,7 @@ namespace DotNETAssemblyGrapherApplication
             }
 
             Name = name;
-            Color = randomColor();
+            Color = RandomColor();
         }
 
         private Color GetColor(string colorname)
@@ -61,13 +61,13 @@ namespace DotNETAssemblyGrapherApplication
             }
             catch
             {
-                return randomColor();
+                return RandomColor();
             }
         }
 
         private List<Color> componentColors = new List<Color>() { Color.BlueViolet, Color.Brown, Color.Chocolate, Color.DarkOrange, Color.DarkGray, Color.ForestGreen, Color.Gold, Color.Goldenrod, Color.Gray, Color.Green, Color.Olive, Color.Orange, Color.SaddleBrown, Color.SeaGreen, Color.Sienna };
         private static Random rand = new Random();
-        private Color randomColor()
+        private Color RandomColor()
         {
             return componentColors[rand.Next(componentColors.Count)];
         }

@@ -6,20 +6,18 @@ namespace DotNETAssemblyGrapherModel
 {
     public class AssemblyPointerGroup
     {
+        public string name;
+        private List<AssemblyPointer> assemblies = new List<AssemblyPointer>();
 
-        private List<AssemblyPointer> pointers = new List<AssemblyPointer>();
-
-        public ReadOnlyCollection<AssemblyPointer> Pointers
+        public ReadOnlyCollection<AssemblyPointer> Assemblies
         {
-            get { return pointers.AsReadOnly() ; }
+            get { return assemblies.AsReadOnly() ; }
         }
-
-        public string Name { get; }
 
         public AssemblyPointerGroup(string name, IEnumerable<AssemblyPointer> assemblies)
         {
-            Name = name;
-            pointers.AddRange(assemblies);
+            this.name = name;
+            this.assemblies.AddRange(assemblies);
         }
     }
 }

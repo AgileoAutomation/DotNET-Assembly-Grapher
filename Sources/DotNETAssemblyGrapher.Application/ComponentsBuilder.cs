@@ -53,9 +53,9 @@ namespace DotNETAssemblyGrapherApplication
                 {
                     Regex regex = new Regex(assemblyname);
 
-                    foreach (AssemblyPointer pointer in model.AllAssemblies().Where(x => regex.Match(x.GetName().Name).Success))
+                    foreach (AssemblyPointer pointer in model.AllAssemblies.Where(x => regex.Match(x.AssemblyName.Name).Success))
                     {
-                        if (pointer.Component() == null)
+                        if (pointer.FindProperty("Component") == null)
                         {
                             componentPointers.Add(pointer);
                             pointer.AddProperty("Component", spec.Name);
@@ -64,8 +64,8 @@ namespace DotNETAssemblyGrapherApplication
                 }
                 else
                 {
-                    AssemblyPointer pointer = model.FindPointerByName(assemblyname);
-                    if (pointer != null && pointer.Component() == null)
+                    AssemblyPointer pointer = model.FindAssemblyById(assemblyname);
+                    if (pointer != null && pointer.FindProperty("Component") == null)
                     {
                         componentPointers.Add(pointer);
                         pointer.AddProperty("Component", spec.Name);

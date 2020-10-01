@@ -2,14 +2,13 @@
 {
     public class Property
     {
-        public string Name { get; private set; }
-
-        public object Value { get; set; }
+        public readonly string name;
+        public readonly string value;
 
         public Property(string name, object value)
         {
-            Name = name;
-            Value = value;
+            this.name = name;
+            this.value = value.ToString();
         }
     }
 }

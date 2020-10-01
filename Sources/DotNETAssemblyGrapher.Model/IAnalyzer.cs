@@ -2,7 +2,7 @@
 
 namespace DotNETAssemblyGrapherModel
 {
-    public interface Analyzer
+    public interface IAnalyzer
     {
         void Analyze(Model model, List<ISpecification> specifications);
     } 

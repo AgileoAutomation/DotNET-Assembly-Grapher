@@ -15,9 +15,9 @@
         <ToolBar 
             Grid.Row="0"
             x:Name="toolBar" Height="25">
-            <Button Name="open" Click="open_Click" Content="Open" Margin="5,0"/>
-            <Button Name="hideErrors" Click="hideErrors_Click" Content="Hide Errors" Margin="5,0" Visibility="Hidden"/>
-            <Button Name="analysis" Click="analysis_Click" Content="Analyze" Margin="5,0" Visibility="Hidden"/>
+            <Button Name="open" Click="Open_Click" Content="Open" Margin="5,0"/>
+            <Button Name="hideErrors" Click="HideErrors_Click" Content="Hide Errors" Margin="5,0" Visibility="Hidden"/>
+            <Button Name="analysis" Click="Analysis_Click" Content="Analyze" Margin="5,0" Visibility="Hidden"/>
         </ToolBar>
         <DockPanel
             x:Name="MainContainer"

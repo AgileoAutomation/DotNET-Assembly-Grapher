@@ -16,7 +16,7 @@ namespace DotNETAssemblyGrapherModel
         {
             get
             {
-                return AssemblyPointerGroups.Count != 0;
+                return Groups.Count != 0;
             }
         }
         public bool HasSubcomponents
@@ -27,25 +27,22 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
+        public IEnumerable<AssemblyPointer> AllAssemblies
+        {
+            get
+            {
+                HashSet<AssemblyPointer> result = new HashSet<AssemblyPointer>(Pointers);
+                foreach (SoftwareComponent component in Subcomponents)
+                {
+                    result.Concat(component.Pointers);
+                }
+                return result;
+            }
+        }
+
         //////////////////////////////
         /////////CONSTRUCTORS/////////
         //////////////////////////////
-
-        //public SoftwareComponent(string name, List<AssemblyPointer> assemblies)
-        //{
-        //    if (assemblies == null || string.IsNullOrEmpty(name))
-        //        throw new ArgumentNullException();
-        //    else if (assemblies.Count == 0)
-        //        throw new ArgumentException();
-
-        //    Name = name;
-        //    Color = Color.Black;
-
-        //    foreach (AssemblyPointer pointer in assemblies)
-        //    {
-        //        Pointers.Add(pointer);
-        //    }
-        //}
 
         public SoftwareComponent(string name, IEnumerable<AssemblyPointer> assemblies, Color color)
         {
@@ -62,27 +59,6 @@ namespace DotNETAssemblyGrapherModel
                 Pointers.Add(pointer);
             }
         }
-
-        //public SoftwareComponent(string name, List<AssemblyPointer> assemblies, List<SoftwareComponent> subcomponents)
-        //{
-        //    if (assemblies == null || string.IsNullOrEmpty(name) || subcomponents == null)
-        //        throw new ArgumentNullException();
-        //    else if (assemblies.Count == 0 && subcomponents.Count == 0)
-        //        throw new ArgumentException();
-
-        //    Name = name;
-        //    Color = Color.Black;
-
-        //    foreach (AssemblyPointer pointer in assemblies)
-        //    {
-        //        Pointers.Add(pointer);
-        //    }
-
-        //    foreach (SoftwareComponent subcomponent in subcomponents)
-        //    {
-        //        AddSubcomponent(subcomponent);
-        //    }
-        //}
 
         public SoftwareComponent(string name, List<AssemblyPointer> assemblies, Color color, List<SoftwareComponent> subcomponents)
         {
@@ -105,9 +81,6 @@ namespace DotNETAssemblyGrapherModel
             }
         }
 
-        /////////////////////////
-        /////////SETTERS/////////
-        /////////////////////////
 
         public void AddSubcomponent(SoftwareComponent subcomponent)
         {
@@ -115,23 +88,19 @@ namespace DotNETAssemblyGrapherModel
             Pointers.AddRange(subcomponent.Pointers);
         }
 
-        /////////////////////////
-        /////////GETTERS/////////
-        /////////////////////////
-
         public AssemblyPointer FindPointer(string name)
         {
-            return Pointers.FirstOrDefault(x => x.GetName().Name == name);
+            return Pointers.FirstOrDefault(x => x.AssemblyName.Name == name);
         }
 
-        public AssemblyPointer FindPointerByPrettyName(string prettyname)
+        public AssemblyPointer FindAssemblyById(string prettyname)
         {
-            return Pointers.FirstOrDefault(x => x.PrettyName == prettyname);
+            return Pointers.FirstOrDefault(x => x.Id == prettyname);
         }
 
         public AssemblyPointerGroup FindGroup(string name)
         {
-            return AssemblyPointerGroups.FirstOrDefault(x => x.Name == name);
+            return Groups.FirstOrDefault(x => x.name == name);
         }
 
         public SoftwareComponent FindSubcomponent(string name)

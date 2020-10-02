@@ -196,6 +196,7 @@
                             </DataTemplate>
                             <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
                                 <Setter Property="Focusable" Value="False" />
+                                <Setter Property="Foreground" Value="Gray" />
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ToggleButton">
@@ -221,7 +222,7 @@
                                                       HorizontalAlignment="Left"
                                                       VerticalAlignment="Center"
                                                       Data="M 5 0 L 10 5 L 5 10 Z"
-                                                      Fill="Gray"/>
+                                                      Fill="{TemplateBinding Foreground}"/>
                                             </Grid>
                                         </ControlTemplate>
                                     </Setter.Value>
@@ -253,12 +254,11 @@
                                                             <ColumnDefinition Width="*" />
                                                             <ColumnDefinition Width="auto"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <ToggleButton
-                                                                x:Name="Expander"
-                                                                Style="{StaticResource ExpandCollapseToggleStyle}"
-                                                                IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                ClickMode="Press"
-                                                                Focusable="False"/>
+                                                        <ToggleButton x:Name="Expander"
+                                                                      Style="{StaticResource ExpandCollapseToggleStyle}"
+                                                                      IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                      ClickMode="Press"
+                                                                      Focusable="False"/>
                                                         <ContentPresenter x:Name="PART_Header" Grid.Column="1"
                                                                             ContentSource="Header"
                                                                             Content="{TemplateBinding Header}"
@@ -268,8 +268,8 @@
                                                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                                                         <StackPanel Grid.Column="2"
-                                                                    Orientation="Horizontal"
-                                                                    Visibility="{Binding ErrorsVisibility}">
+                                                                    x:Name="ErrorPanel"
+                                                                    Orientation="Horizontal">
                                                             <iconPacks:PackIconMaterial Kind="AlertOutline" Foreground="Red"
                                                                                         VerticalAlignment="Center"/>
                                                             <TextBlock Text="{Binding ErrorsCount}" Foreground="Red"
@@ -289,14 +289,21 @@
                                                     <Setter TargetName="Expander" Property="UIElement.Visibility" Value="Hidden" />
                                                 </Trigger>
                                                 <Trigger Property="TreeViewItem.IsSelected" Value="True">
-                                                    <Setter TargetName="ItemBorder" Property="Panel.Background" Value="LightSteelBlue" />
+                                                    <Setter TargetName="ItemBorder" Property="Panel.Background" Value="RoyalBlue" />
+                                                    <Setter TargetName="ItemBorder" Property="TextBlock.Foreground" Value="White" />
+                                                    <Setter TargetName="Expander" Property="Foreground" Value="White" />
                                                 </Trigger>
+                                                <DataTrigger Binding="{Binding HasErrors}" Value="False">
+                                                    <Setter TargetName="ErrorPanel" Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
                                                 <MultiTrigger>
                                                     <MultiTrigger.Conditions>
                                                         <Condition Property="IsSelected" Value="False"/>
                                                         <Condition SourceName="ItemBorder" Property="IsMouseOver" Value="True"/>
                                                     </MultiTrigger.Conditions>
-                                                    <Setter TargetName="ItemBorder" Property="Background" Value="AliceBlue"/>
+                                                    <Setter TargetName="ItemBorder" Property="Panel.Background" Value="CornflowerBlue"/>
+                                                    <Setter TargetName="ItemBorder" Property="TextBlock.Foreground" Value="White" />
+                                                    <Setter TargetName="Expander" Property="Foreground" Value="White" />
                                                 </MultiTrigger>
                                                 <Trigger Property="UIElement.IsEnabled" Value="False">
                                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />

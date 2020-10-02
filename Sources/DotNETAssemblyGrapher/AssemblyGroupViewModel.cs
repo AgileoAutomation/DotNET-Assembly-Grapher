@@ -26,31 +26,9 @@ namespace DotNETAssemblyGrapher
 
         public int Count => AssemblyPointerViewModels.Count;
 
-        public int Errors
-        {
-            get
-            {
-                int i = 0;
-                foreach (AssemblyPointerViewModel vm in AssemblyPointerViewModels)
-                {
-                    i += vm.ErrorsCount;
-                }
-                return i;
-            }
-        }
+        public int ErrorsCount => model.ErrorsCount;
 
-        public int ErrorsCount
-        {
-            get
-            {
-                int i = 0;
-                foreach (AssemblyPointerViewModel assembly in AssemblyPointerViewModels)
-                {
-                    i += assembly.ErrorsCount;
-                }
-                return i;
-            }
-        }
+        public bool HasErrors => model.HasErrors;
 
         private bool _isSelected;
         public bool IsSelected
@@ -59,19 +37,9 @@ namespace DotNETAssemblyGrapher
             set
             {
                 _isSelected = value;
-                if (value)
+                foreach (AssemblyPointerViewModel assembly in AssemblyPointerViewModels)
                 {
-                    foreach (AssemblyPointerViewModel assembly in AssemblyPointerViewModels)
-                    {
-                        assembly.Node.Node.Attr.FillColor = Microsoft.Msagl.Drawing.Color.DodgerBlue;
-                    }
-                }
-                else
-                {
-                    foreach (AssemblyPointerViewModel assembly in AssemblyPointerViewModels)
-                    {
-                        assembly.Node.Node.Attr.FillColor = Microsoft.Msagl.Drawing.Color.White;
-                    }
+                    assembly.Node.MarkedForDragging = _isSelected;
                 }
             }
         }

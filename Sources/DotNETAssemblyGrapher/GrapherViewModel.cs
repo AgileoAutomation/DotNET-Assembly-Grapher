@@ -58,7 +58,7 @@ namespace DotNETAssemblyGrapher
         }
 
         public UICommand Center { get; }
-        private void CenterExecute() { } //graph.Graph.SetInitialTransform();
+        private void CenterExecute() => graph.Viewer.SetInitialTransform();
 
         private bool areErrorsHidden = false;
         public UICommand Errors { get; }

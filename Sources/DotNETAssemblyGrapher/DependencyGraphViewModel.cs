@@ -13,24 +13,8 @@ namespace DotNETAssemblyGrapher
     {
         private Model model;
         public Graph Graph { get; }
-        public GraphViewer Viewer { get; } = new GraphViewer();
-        private DockPanel _panel = null;
-        public DockPanel GraphPanel
-        {
-            get
-            {
-                if (_panel == null)
-                {
-                    _panel = new DockPanel
-                    {
-                        ClipToBounds = true
-                    };
-                    Viewer.BindToPanel(_panel);
-                    Viewer.Graph = Graph;
-                }
-                return _panel;
-            }
-        }
+        public GraphViewer Viewer { get; }
+        public DockPanel GraphPanel { get; }
 
         public HashSet<AssemblyPointerViewModel> assemblies = new HashSet<AssemblyPointerViewModel>();
 
@@ -56,12 +40,27 @@ namespace DotNETAssemblyGrapher
             {
                 assemblies.Add(new AssemblyPointerViewModel(assembly));
 
-                if (Graph.FindNode(assembly.Id) == null)
-                    Graph.AddNode(assembly.Id);
+                Node node = Graph.FindNode(assembly.Id);
+                if (node == null)
+                    node = Graph.AddNode(assembly.Id);
+                node.Attr.LabelMargin = 3;
             }
 
+            GraphPanel = new DockPanel
+            {
+                ClipToBounds = true
+            };
+            Viewer = new GraphViewer();
+            Viewer.BindToPanel(GraphPanel);
             Viewer.GraphChanged += Viewer_GraphChanged;
+            AssemblyPointerViewModel.SelectionChanged += AssemblyPointerViewModel_SelectionChanged;
             Viewer.Graph = Graph;
+        }
+
+        private void AssemblyPointerViewModel_SelectionChanged(object sender, EventArgs e)
+        {
+            Viewer.Invalidate((sender as AssemblyPointerViewModel).Node);
+
         }
 
         private Subgraph SetSubgraph(Graph graph, SoftwareComponent component)
@@ -113,14 +112,6 @@ namespace DotNETAssemblyGrapher
                     {
                         foreach (Edge edge in node.InEdges)
                             edge.Attr.Color = Color.Red;
-                    }
-
-                    // Display errors in a tooltip
-                    TextBlock nodeLabel = Viewer.GraphCanvas.Children.OfType<TextBlock>().First(x => x.Text == node.LabelText);
-                    foreach (string error in assembly.Errors)
-                    {
-                        nodeLabel.ToolTip = node.Id;
-                        nodeLabel.ToolTip += "\n" + error;
                     }
                 }
             }

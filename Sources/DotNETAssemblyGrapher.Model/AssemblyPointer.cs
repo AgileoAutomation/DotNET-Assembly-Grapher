@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration.Assemblies;
 using System.Linq;
 using System.Reflection;
 
@@ -59,7 +60,10 @@ namespace DotNETAssemblyGrapherModel
 
         public bool HasManifest => AssemblyName != null;
 
-        public bool IsSystemAssembly => physicalyExists && Assembly.Location.ToLower().Contains("microsoft.net");
+        public bool IsSystemAssembly => physicalyExists && Assembly.GlobalAssemblyCache
+            && AssemblyName.Flags == AssemblyNameFlags.None
+            && AssemblyName.HashAlgorithm == AssemblyHashAlgorithm.None
+            && AssemblyName.ProcessorArchitecture == ProcessorArchitecture.None;
 
         public HashSet<string> Errors { get; private set; } = new HashSet<string>();
         public bool HasErrors => Errors.Count > 0;

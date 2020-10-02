@@ -27,6 +27,7 @@ namespace DotNETAssemblyGrapherModel
                 return new List<Regex>()
                 {
                     new Regex("mscorlib"),
+                    new Regex("netstandard"),
                     new Regex("System"),
                     new Regex("System.Core"),
                     new Regex("System.Data"),

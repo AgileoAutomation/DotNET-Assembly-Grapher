@@ -9,15 +9,27 @@ namespace DotNETAssemblyGrapherModel
         public string name;
         private List<AssemblyPointer> assemblies = new List<AssemblyPointer>();
 
-        public ReadOnlyCollection<AssemblyPointer> Assemblies
-        {
-            get { return assemblies.AsReadOnly() ; }
-        }
-
         public AssemblyPointerGroup(string name, IEnumerable<AssemblyPointer> assemblies)
         {
             this.name = name;
             this.assemblies.AddRange(assemblies);
         }
+
+        public ReadOnlyCollection<AssemblyPointer> Assemblies => assemblies.AsReadOnly();
+
+        public int ErrorsCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (AssemblyPointer assembly in Assemblies)
+                {
+                    count = assembly.Errors.Count;
+                }
+                return count;
+            }
+        }
+
+        public bool HasErrors => ErrorsCount > 0;
     }
 }

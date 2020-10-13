@@ -13,11 +13,16 @@ namespace DotNETAssemblyGrapher
         public AssemblyPointerViewModel(AssemblyPointer model)
         {
             this.model = model;
+            Properties = new ObservableCollection<PropertyViewModel>();
+            foreach (Property property in model.Properties)
+            {
+                Properties.Add(new PropertyViewModel(property));
+            }
         }
 
         public string Id => model.Id;
 
-        public ObservableCollection<Property> Properties { get; }
+        public ObservableCollection<PropertyViewModel> Properties { get; }
         public int PropertiesCount => model.Properties.Count;
 
         public int ErrorsCount => model.Errors.Count;

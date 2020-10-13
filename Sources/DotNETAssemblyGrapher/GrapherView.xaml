@@ -57,7 +57,7 @@
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Top" Text="Properties" Margin="3,1,0,3" />
                         <ListView
-                          ItemsSource="{Binding SelectedItem.Properties}"
+                          ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Properties}"
                           BorderThickness="0"
                           IsEnabled="{Binding AreControlsEnabled}">
                             <ListView.View>

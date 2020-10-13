@@ -94,6 +94,7 @@
     <Compile Include="DependencyGraphViewModel.cs" />
     <Compile Include="AssemblyPointerViewModel.cs" />
     <Compile Include="ModelBuildingViewModel.cs" />
+    <Compile Include="PropertyViewModel.cs" />
     <Compile Include="UserCommand.cs" />
     <Page Include="GrapherView.xaml">
       <Generator>MSBuild:Compile</Generator>

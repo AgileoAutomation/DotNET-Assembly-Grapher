@@ -39,7 +39,7 @@ namespace DotNETAssemblyGrapher
                 _isSelected = value;
                 foreach (AssemblyPointerViewModel assembly in AssemblyPointerViewModels)
                 {
-                    assembly.Node.MarkedForDragging = _isSelected;
+                    assembly.IsSelected = _isSelected;
                 }
             }
         }

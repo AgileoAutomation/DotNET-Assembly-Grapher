@@ -92,7 +92,7 @@ namespace DotNETAssemblyGrapherModel
                     }
                     catch (Exception e)
                     {
-                        Inputs.Add(new AssemblyPointer(file.Name.Replace(file.Extension, ""), e.Message));
+                        Inputs.Add(new AssemblyPointer(file, e.Message));
                     }
                 }
             }
@@ -150,7 +150,7 @@ namespace DotNETAssemblyGrapherModel
             HashSet<AssemblyPointer> systemAssemblies = new HashSet<AssemblyPointer>();
             HashSet<AssemblyPointer> nonReferencedAssemblies = new HashSet<AssemblyPointer>();
             HashSet<AssemblyPointer> missingAssemblies = new HashSet<AssemblyPointer>();
-            HashSet<AssemblyPointer> nonDotNetAssemblies = new HashSet<AssemblyPointer>();
+            HashSet<AssemblyPointer> windowsDLLs = new HashSet<AssemblyPointer>();
 
             foreach (AssemblyPointer assembly in AllAssemblies)
             {
@@ -166,13 +166,13 @@ namespace DotNETAssemblyGrapherModel
                     missingAssemblies.Add(assembly);
 
                 if (!assembly.HasManifest)
-                    nonDotNetAssemblies.Add(assembly);
+                    windowsDLLs.Add(assembly);
             }
 
-            AddGroup("Referenced Assemblies", referencedAssemblies);
+            //AddGroup("Referenced Assemblies", referencedAssemblies);
             AddGroup("Non Referenced Assemblies", nonReferencedAssemblies);
             AddGroup("Missing Assemblies", missingAssemblies);
-            AddGroup("Whitout Manifest Assemblies", nonDotNetAssemblies);
+            AddGroup("Windows DLLs", windowsDLLs);
             AddGroup("Version Conflicts", FindVersionConflicts());
 
             if (systemAssemblies.Count != 0)
@@ -186,7 +186,7 @@ namespace DotNETAssemblyGrapherModel
         private HashSet<AssemblyPointer> FindVersionConflicts()
         {
             HashSet<AssemblyPointer> versionConfilcts = new HashSet<AssemblyPointer>();
-            HashSet<AssemblyPointer> all = new HashSet<AssemblyPointer>(AllAssemblies.Except(FindGroupByName("Whitout Manifest Assemblies").Assemblies));
+            HashSet<AssemblyPointer> all = new HashSet<AssemblyPointer>(AllAssemblies.Except(FindGroupByName("Windows DLLs").Assemblies));
 
             foreach (AssemblyPointer assembly in all)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration.Assemblies;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -19,10 +20,10 @@ namespace DotNETAssemblyGrapherModel
                 Assembly = Assembly.Load(AssemblyName);
                 physicalyExists = true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Impossible to load, the assembly does not exist.
-                Errors.Add("This assembly is referenced but physically missing");
+                // Impossible to load.
+                Errors.Add(e.Message);
                 physicalyExists = false;
             }
             finally
@@ -39,15 +40,20 @@ namespace DotNETAssemblyGrapherModel
             AddMainProperties();
         }
 
-        public AssemblyPointer(string name, string loadingError)
+        public AssemblyPointer(FileInfo file, string loadingError)
         {
+            try
+            {
+                
+            }
+            catch (Exception e)
+            {
+                
+            }
+            
             physicalyExists = false;
-            Properties.Add(new Property("Name", name));
-            Errors.Add
-            (
-                "Even AssemblyName can't be loaded: This dll may not be a .NET ddl\n" +
-                "Error Message:\n" + loadingError
-            );
+            Properties.Add(new Property("Name", file.Name));
+            Properties.Add(new Property("Windows DLL", loadingError));
         }
 
         public Assembly Assembly { get; private set; }

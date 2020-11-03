@@ -24,7 +24,7 @@ namespace DotNETAssemblyGrapherModel
                 int count = 0;
                 foreach (AssemblyPointer assembly in Assemblies)
                 {
-                    count = assembly.Errors.Count;
+                    count += assembly.Errors.Count;
                 }
                 return count;
             }

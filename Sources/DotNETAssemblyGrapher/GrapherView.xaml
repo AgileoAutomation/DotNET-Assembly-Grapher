@@ -14,7 +14,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Height="25" Orientation="Horizontal" Margin="5,0">
             <Button Content="Open" Command="{Binding Open}" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
@@ -53,17 +52,22 @@
                     </ContentControl>
                 </Border>
                 <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"/>
-                <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="0.7" Padding="2">
+                <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="0.7">
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="Properties" Margin="3,1,0,3" />
-                        <ListView
-                          ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Properties}"
-                          BorderThickness="0"
-                          IsEnabled="{Binding AreControlsEnabled}">
+                        <TextBlock DockPanel.Dock="Top" Text="Properties" Margin="5" />
+                        <ListView ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Properties}"
+                                  BorderThickness="0" Margin="1,0"
+                                  IsEnabled="{Binding AreControlsEnabled}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}" />
-                                    <GridViewColumn Header="Value" Width="900" DisplayMemberBinding="{Binding Value}" />
+                                    <GridViewColumn Header="Value" Width="890">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                 </GridView>
                             </ListView.View>
                             <ListView.Resources>
@@ -318,7 +322,5 @@
                 </DockPanel>
             </Border>
         </Grid>
-        <StatusBar Grid.Row="2" Height="25" Background="WhiteSmoke" BorderThickness="0"/>
     </Grid>
-
 </Window>

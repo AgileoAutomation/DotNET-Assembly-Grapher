@@ -121,7 +121,6 @@ namespace DotNETAssemblyGrapher
         #endregion
 
         public bool AreControlsEnabled => model != null;
-        public AssemblyPointerViewModel SelectedItem => graph?.assemblies.FirstOrDefault(a => a.IsSelected);
 
         public ObservableCollection<AssemblyGroupViewModel> GroupViewModels { get; private set; } = new ObservableCollection<AssemblyGroupViewModel>();
 
@@ -139,18 +138,12 @@ namespace DotNETAssemblyGrapher
             OnPropertyChanged(nameof(AreControlsEnabled));
             OnPropertyChanged(nameof(GroupViewModels));
 
-            AssemblyPointerViewModel.SelectionChanged += AssemblyInfoViewModel_SelectionChanged;
-
             MainViewModel = graph;
             Center.OnCanExecuteChanged();
             Errors.OnCanExecuteChanged();
         }
 
-        private void AssemblyInfoViewModel_SelectionChanged(object sender, EventArgs e)
-        {
-            OnPropertyChanged(nameof(SelectedItem));
-        }
-
+        #region Analyze
 
 
         WorkbookPart workbookPart;
@@ -239,5 +232,7 @@ namespace DotNETAssemblyGrapher
             else
                 return null;
         }
+
+        #endregion
     }
 }

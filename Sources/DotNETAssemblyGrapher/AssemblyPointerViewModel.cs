@@ -15,9 +15,9 @@ namespace DotNETAssemblyGrapher
             this.model = model;
             Properties = new ObservableCollection<PropertyViewModel>();
             foreach (Property property in model.Properties)
-            {
                 Properties.Add(new PropertyViewModel(property));
-            }
+            foreach (string error in model.Errors)
+                Properties.Add(new PropertyViewModel(new Property("Error", error)));
         }
 
         public string Id => model.Id;

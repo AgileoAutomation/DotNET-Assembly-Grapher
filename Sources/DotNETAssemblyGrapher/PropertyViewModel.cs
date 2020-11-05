@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DotNETAssemblyGrapher
 {
-    public class PropertyViewModel : BaseViewModel
+    public class PropertyViewModel
     {
         private Property model;
 

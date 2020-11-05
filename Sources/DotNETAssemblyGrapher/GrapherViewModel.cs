@@ -24,6 +24,7 @@ namespace DotNETAssemblyGrapher
             Open = new UICommand(() => true, OpenExecute);
             Center = new UICommand(() => graph != null, CenterExecute);
             Errors = new UICommand(() => GroupViewModels.Any(g => g.ErrorsCount > 0), ErrorsExecute);
+            ExportAsImage = new UICommand(() => graph != null, ExportExecute);
         }
 
         private DependencyGraphViewModel graph;
@@ -85,6 +86,22 @@ namespace DotNETAssemblyGrapher
             }
         }
 
+        public UICommand ExportAsImage { get; }
+        private void ExportExecute()
+        {
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Title = "Exporter une image du graph",
+                CreatePrompt = true,
+                AddExtension = true,
+                Filter = "JPEG files (*.jpg)|*.jpg|PNG files (*.png)|*.png|Bitmap files (*.bmp)|*.bmp"
+            };
+            if (dialog.ShowDialog().Value)
+            {
+                graph.Viewer.DrawImage(dialog.FileName);
+            }
+        }
+
         #endregion
 
         #region Open New Folder
@@ -126,13 +143,14 @@ namespace DotNETAssemblyGrapher
 
         public void BuildGraphAndTreeViewModels()
         {
-            // Step 1 : Creating all Assemblies View Models and Binding with GraphViewer Nodes;
+            // Step 1 : Creating all Assemblies / Dependencies View Models
+            //      and Binding with GraphViewer Nodes / Edges;
             graph = new DependencyGraphViewModel(model);
 
             // Step 2 : Grouping Assemblies View Models
             foreach (AssemblyPointerGroup group in model.Groups)
             {
-                GroupViewModels.Add(new AssemblyGroupViewModel(group, graph.assemblies));
+                GroupViewModels.Add(new AssemblyGroupViewModel(group));
             }
 
             OnPropertyChanged(nameof(AreControlsEnabled));
@@ -141,6 +159,7 @@ namespace DotNETAssemblyGrapher
             MainViewModel = graph;
             Center.OnCanExecuteChanged();
             Errors.OnCanExecuteChanged();
+            ExportAsImage.OnCanExecuteChanged();
         }
 
         #region Analyze

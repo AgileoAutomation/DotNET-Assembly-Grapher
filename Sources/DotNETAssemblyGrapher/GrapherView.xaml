@@ -15,11 +15,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Height="25" Orientation="Horizontal" Margin="5,0">
-            <Button Content="Open" Command="{Binding Open}" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,0">
+            <Button Command="{Binding Open}" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                <iconPacks:PackIconMaterial Kind="FolderOpen"/>
+            </Button>
             <Button Content="Center" Command="{Binding Center}" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
             <ToggleButton Content="Errors" Command="{Binding Errors}" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"/>
             <Button Content="Analysis" Click="Analysis_Click" Padding="5,2" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+            <Button Command="{Binding ExportAsImage}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                <iconPacks:PackIconMaterial Kind="Image"/>
+            </Button>
         </StackPanel>
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
@@ -196,7 +201,18 @@
                                 </StackPanel>
                             </HierarchicalDataTemplate>
                             <DataTemplate DataType="{x:Type local:AssemblyPointerViewModel}">
-                                <TextBlock Text="{Binding Id}"/>
+                                <DockPanel>
+                                    <ToggleButton x:Name="HideButton"
+                                                  DockPanel.Dock="Right"
+                                                  IsChecked="{Binding IsHidden}"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  Margin="10,0">
+                                        <iconPacks:PackIconMaterial x:Name="HideIcon" Kind="EyeOff" Padding="1"
+                                                                    Foreground="{Binding ElementName=AssemblyId, Path=Foreground}"/>
+                                    </ToggleButton>
+                                    <TextBlock x:Name="AssemblyId" Text="{Binding Id}"/>
+                                </DockPanel>
                             </DataTemplate>
                             <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
                                 <Setter Property="Focusable" Value="False" />
@@ -234,6 +250,8 @@
                             </Style>
                             <Style TargetType="TreeViewItem">
                                 <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="TreeViewItem">
@@ -250,6 +268,7 @@
                                                         HorizontalAlignment="Stretch"
                                                         BorderThickness="{TemplateBinding BorderThickness}"
                                                         BorderBrush="{TemplateBinding BorderBrush}"
+                                                        Margin="0,-1,0,0"
                                                         Padding="{TemplateBinding Padding}"
                                                         Background="{TemplateBinding Background}">
                                                     <Grid Margin="{Binding Converter={StaticResource lengthConverter}, RelativeSource={RelativeSource TemplatedParent}}">
@@ -260,7 +279,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <ToggleButton x:Name="Expander"
                                                                       Style="{StaticResource ExpandCollapseToggleStyle}"
-                                                                      IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                      IsChecked="{Binding IsExpanded}"
                                                                       ClickMode="Press"
                                                                       Focusable="False"/>
                                                         <ContentPresenter x:Name="PART_Header" Grid.Column="1"

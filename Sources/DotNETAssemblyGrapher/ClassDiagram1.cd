@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DotNETAssemblyGrapher.AssemblyGroupViewModel">
+    <Position X="12" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAEAAAAAAgAASAAAAAAAAIAAAAAAAIAAA=</HashCode>
+      <FileName>AssemblyGroupViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="AssemblyPointerViewModels" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DotNETAssemblyGrapher.AssemblyPointerViewModel">
+    <Position X="7.75" Y="2.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACABAAAAEAEAAAAAAAAAAAAAAAQEAIAAAAACEKAAA=</HashCode>
+      <FileName>AssemblyPointerViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DotNETAssemblyGrapher.BaseViewModel">
+    <Position X="6" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BaseViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DotNETAssemblyGrapher.DependencyGraphViewModel">
+    <Position X="3.75" Y="2.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAIAAEQAAAAAAAQBAAAABgEgAAAAAAAAYAAA=</HashCode>
+      <FileName>DependencyGraphViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DotNETAssemblyGrapher.GrapherViewModel">
+    <Position X="0.5" Y="2.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>gEAACAEAAAIAYYAAAIAQACAAGAAAAAAAABAAIEAIEAA=</HashCode>
+      <FileName>GrapherViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DotNETAssemblyGrapher.DependencyViewModel">
+    <Position X="11.25" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>DependencyViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

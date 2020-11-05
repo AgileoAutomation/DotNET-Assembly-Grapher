@@ -17,6 +17,7 @@ namespace DotNETAssemblyGrapher
         public DockPanel GraphPanel { get; }
 
         public HashSet<AssemblyPointerViewModel> assemblies = new HashSet<AssemblyPointerViewModel>();
+        public HashSet<DependencyViewModel> dependencies = new HashSet<DependencyViewModel>();
 
         public DependencyGraphViewModel(Model model)
         {
@@ -27,67 +28,49 @@ namespace DotNETAssemblyGrapher
             foreach (Dependency dependency in model.Dependencies)
             {
                 Graph.AddEdge(dependency.from.Id, dependency.to.Id);
+                DependencyViewModel dpvm = new DependencyViewModel(dependency);
+                dependencies.Add(dpvm);
+                assemblies.Add(dpvm.From);
+                assemblies.Add(dpvm.To);
             }
 
-            //Set subgraphs
-            foreach (SoftwareComponent component in model.SoftwareComponents)
-            {
-                Graph.RootSubgraph.AddSubgraph(SetSubgraph(Graph, component));
-            }
-
-            // Creating View Models and adding alone nodes
+            // Adding alone nodes and creating corresponding View Models
             foreach (AssemblyPointer assembly in model.AllAssemblies)
             {
-                assemblies.Add(new AssemblyPointerViewModel(assembly));
-
                 Node node = Graph.FindNode(assembly.Id);
                 if (node == null)
+                {
                     node = Graph.AddNode(assembly.Id);
-                node.Attr.LabelMargin = 3;
+                    assemblies.Add(AssemblyPointerViewModel.Create(assembly));
+                }
+
+                node.Attr.LabelMargin = 4;
             }
 
+            // Init Viewer
             GraphPanel = new DockPanel
             {
                 ClipToBounds = true
             };
+
             Viewer = new GraphViewer();
             Viewer.BindToPanel(GraphPanel);
-            Viewer.GraphChanged += Viewer_GraphChanged;
-            AssemblyPointerViewModel.SelectionChanged += AssemblyPointerViewModel_SelectionChanged;
             Viewer.Graph = Graph;
-        }
 
-        private void AssemblyPointerViewModel_SelectionChanged(object sender, EventArgs e)
-        {
-            Viewer.Invalidate((sender as AssemblyPointerViewModel).Node);
-
-        }
-
-        private Subgraph SetSubgraph(Graph graph, SoftwareComponent component)
-        {
-            Subgraph subgraph = new Subgraph(component.Name);
-
-            // Before build children subgraphs
-            foreach (SoftwareComponent subcomponent in component.Subcomponents)
+            if (Viewer.Graph.Nodes.Count() != 0)
             {
-                subgraph.AddSubgraph(SetSubgraph(graph, subcomponent));
-            }
+                UpdateErrorNodes();
 
-            // Add correct nodes in subgraph
-            foreach (AssemblyPointer pointer in component.AllAssemblies)
-            {
-                Property comp = pointer.FindProperty("Component");
-                if (comp != null
-                    && comp.value == component.Name)
+                // Reset events listening for all nodes
+                foreach (var obj in Viewer.Entities)
                 {
-                    Node node = graph.FindNode(pointer.Id);
-                    if (node != null)
-                        subgraph.AddNode(node);
+                    if (obj is IViewerNode node)
+                    {
+                        assemblies.First(a => a.Id == node.Node.Id).Node = node;
+                        node.MarkedForDraggingEvent += Node_MarkedForDragging;
+                    }
                 }
             }
-
-            subgraph.Attr.Color = ConvertSystemDrawingToMsaglColor(component);
-            return subgraph;
         }
 
         private Color ConvertSystemDrawingToMsaglColor(SoftwareComponent component)
@@ -117,19 +100,40 @@ namespace DotNETAssemblyGrapher
             }
         }
 
-        private void Viewer_GraphChanged(object sender, EventArgs e)
+        private void Node_MarkedForDragging(object sender, EventArgs e)
         {
-            if (Viewer.Graph.Nodes.Count() != 0)
-            {
-                UpdateErrorNodes();
+            IViewerNode node = sender as IViewerNode;
+            node.MarkedForDraggingEvent -= Node_MarkedForDragging;
 
-                // Reset events listening for all nodes
-                foreach (var obj in Viewer.Entities)
-                {
-                    if (obj is IViewerNode node)
-                        assemblies.First(a => a.Id == node.Node.Id).Node = node;
-                }
+            node.Node.Attr.FillColor = Color.RoyalBlue;
+            node.Node.Label.FontColor = Color.White;
+            Viewer.Invalidate(node);
+
+            foreach (var edge in node.OutEdges)
+            {
+                edge.Edge.Attr.Color = Color.RoyalBlue;
+                Viewer.Invalidate(edge);
             }
+
+            node.UnmarkedForDraggingEvent += Node_UnmarkedForDragging;
+        }
+
+        private void Node_UnmarkedForDragging(object sender, EventArgs e)
+        {
+            IViewerNode node = sender as IViewerNode;
+            node.UnmarkedForDraggingEvent -= Node_UnmarkedForDragging;
+
+            node.Node.Label.FontColor = Color.Black;
+            node.Node.Attr.FillColor = Color.White;
+            Viewer.Invalidate(node);
+
+            foreach (var edge in node.OutEdges)
+            {
+                edge.Edge.Attr.Color = Color.Black;
+                Viewer.Invalidate(edge);
+            }
+
+            node.MarkedForDraggingEvent += Node_MarkedForDragging;
         }
     }
 }

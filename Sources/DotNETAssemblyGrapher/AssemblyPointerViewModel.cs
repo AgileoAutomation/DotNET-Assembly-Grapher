@@ -1,16 +1,37 @@
 ﻿using DotNETAssemblyGrapherModel;
 using Microsoft.Msagl.Drawing;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace DotNETAssemblyGrapher
 {
     public class AssemblyPointerViewModel : BaseViewModel
     {
-        internal static event EventHandler SelectionChanged;
+        static readonly List<AssemblyPointerViewModel> createdViewModels = new List<AssemblyPointerViewModel>();
+        public static AssemblyPointerViewModel Create(AssemblyPointer model)
+        {
+            AssemblyPointerViewModel result;
+
+            result = createdViewModels.FirstOrDefault(a => a.Id == model.Id);
+            if (result == null)
+            {
+                result = new AssemblyPointerViewModel(model);
+                createdViewModels.Add(result);
+            }
+
+            return result;
+        }
+
+        public static AssemblyPointerViewModel Get(AssemblyPointer model)
+            => createdViewModels.FirstOrDefault(a => a.Id == model.Id);
+
+        // Instance members
+        
         private AssemblyPointer model;
 
-        public AssemblyPointerViewModel(AssemblyPointer model)
+        private AssemblyPointerViewModel(AssemblyPointer model)
         {
             this.model = model;
             Properties = new ObservableCollection<PropertyViewModel>();
@@ -36,39 +57,68 @@ namespace DotNETAssemblyGrapher
             {
                 if (_node != null)
                 {
-                    _node.MarkedForDraggingEvent -= Node_MarkedForDraggingEvent;
-                    _node.UnmarkedForDraggingEvent -= Node_UnmarkedForDraggingEvent;
+                    _node.MarkedForDraggingEvent -= Node_MarkedForDragging;
+                    _node.UnmarkedForDraggingEvent -= Node_UnmarkedForDragging;
                 }
 
                 _node = value;
-                _node.MarkedForDraggingEvent += Node_MarkedForDraggingEvent;
-                _node.UnmarkedForDraggingEvent += Node_UnmarkedForDraggingEvent;
+                _node.MarkedForDraggingEvent += Node_MarkedForDragging;
             }
         }
         private IViewerNode _node;
 
+        // Selected by the graph
+        private void Node_MarkedForDragging(object sender, EventArgs e)
+        {
+            OnPropertyChanged(nameof(IsSelected));
+        }
+
+        // Unselected by the graph
+        private void Node_UnmarkedForDragging(object sender, EventArgs e)
+        {
+            OnPropertyChanged(nameof(IsSelected));
+        }
+
+        // Selected / Unselected by the treeview
         public bool IsSelected
         {
             get => Node.MarkedForDragging;
             set
             {
-                Node.MarkedForDragging = value;
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
+                if (_node.MarkedForDragging != value)
+                {
+                    _node.MarkedForDragging = value;
+                }
             }
         }
 
-        private void Node_MarkedForDraggingEvent(object sender, EventArgs e)
+        public bool IsHidden
         {
-            Node.Node.Attr.FillColor = Color.RoyalBlue;
-            Node.Node.Label.FontColor = Color.White;
-            OnPropertyChanged(nameof(IsSelected));
-        }
+            get => !Node.Node.IsVisible;
+            set
+            {
+                Node.Node.IsVisible = !value;
+                if (_node.Node.IsVisible)
+                {
+                    foreach (var inEdge in _node.Node.InEdges)
+                    {
+                        inEdge.IsVisible = inEdge.SourceNode.IsVisible;
+                    }
+                    foreach (var outEdge in _node.Node.OutEdges)
+                    {
+                        outEdge.IsVisible = outEdge.TargetNode.IsVisible;
+                    }
+                }
+                else
+                {
+                    foreach (var edge in Node.Node.Edges)
+                    {
+                        edge.IsVisible = false;
+                    }
+                }
 
-        private void Node_UnmarkedForDraggingEvent(object sender, EventArgs e)
-        {
-            Node.Node.Label.FontColor = Color.Black;
-            Node.Node.Attr.FillColor = Color.White;
-            OnPropertyChanged(nameof(IsSelected));
+                OnPropertyChanged(nameof(IsHidden));
+            }
         }
     }
 }
